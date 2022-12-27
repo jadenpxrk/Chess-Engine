@@ -1,7 +1,5 @@
-// Note: 2D and long 1D arrays will be vertical because of code formatters
-
 // Initializing the chess engine
-var Engine = function (
+var chessEngine = function (
   sizeOfBoard,
   lightSquare,
   darkSquare,
@@ -407,8 +405,8 @@ var Engine = function (
     pieces: new Array(13 * 10),
   };
 
-  // The board move stack
-  var moveStack = [];
+  // The board moves stack
+  var movesStack = [];
 
   // Plies
   var searchOne = 0;
@@ -485,7 +483,7 @@ var Engine = function (
     fifty = 0;
     hashKey = 0;
     kingSquare = [0, 0];
-    moveStack = [];
+    movesStack = [];
 
     // This is ressetting the plies
     searchOne = 0;
@@ -523,11 +521,11 @@ var Engine = function (
     generateMoves(moveList);
 
     // This parsing moves into a string
-    var sourceSquare =
+    var previousSquare =
       moveString[0].charCodeAt() -
       "a".charCodeAt() +
       (8 - (moveString[1].charCodeAt() - "0".charCodeAt())) * 16;
-    var targetSquare =
+    var nextSquare =
       moveString[2].charCodeAt() -
       "a".charCodeAt() +
       (8 - (moveString[3].charCodeAt() - "0".charCodeAt())) * 16;
@@ -538,8 +536,8 @@ var Engine = function (
       var promotedPiece = 0;
 
       if (
-        getMoveSource(move) == sourceSquare &&
-        getMoveTarget(move) == targetSquare
+        getMoveSource(move) == previousSquare &&
+        getMoveTarget(move) == nextSquare
       ) {
         // Here we will check if a piece is promoting
         promotedPiece = getMovePromoted(move);
@@ -587,10 +585,10 @@ var Engine = function (
   function isSquareAttacked(square, side) {
     // If it is being attacked by pawns
     for (let index = 0; index < 2; index++) {
-      let targetSquare = square + pawnDirections.offsets[side][index];
+      let nextSquare = square + pawnDirections.offsets[side][index];
       if (
-        (targetSquare & 0x88) == 0 &&
-        board[targetSquare] == pawnDirections.pawn[side]
+        (nextSquare & 0x88) == 0 &&
+        board[nextSquare] == pawnDirections.pawn[side]
       )
         return 1;
     }
@@ -598,9 +596,9 @@ var Engine = function (
     // If it is being attacked by jumping pieces
     for (let piece in jumpingPieces) {
       for (let index = 0; index < 8; index++) {
-        let targetSquare = square + jumpingPieces[piece].offsets[index];
-        let targetPiece = board[targetSquare];
-        if ((targetSquare & 0x88) == 0)
+        let nextSquare = square + jumpingPieces[piece].offsets[index];
+        let targetPiece = board[nextSquare];
+        if ((nextSquare & 0x88) == 0)
           if (targetPiece == jumpingPieces[piece].side[side]) return 1;
       }
     }
@@ -608,12 +606,12 @@ var Engine = function (
     // If it is being attaced by sniper pieces
     for (let piece in sniperPieces) {
       for (let index = 0; index < 4; index++) {
-        let targetSquare = square + sniperPieces[piece].offsets[index];
-        while ((targetSquare & 0x88) == 0) {
-          var targetPiece = board[targetSquare];
+        let nextSquare = square + sniperPieces[piece].offsets[index];
+        while ((nextSquare & 0x88) == 0) {
+          var targetPiece = board[nextSquare];
           if (sniperPieces[piece].side[side].includes(targetPiece)) return 1;
           if (targetPiece) break;
-          targetSquare += sniperPieces[piece].offsets[index];
+          nextSquare += sniperPieces[piece].offsets[index];
         }
       }
     }
@@ -905,18 +903,18 @@ var Engine = function (
   function generateMoves(moveList) {
     for (let piece = P; piece <= k; piece++) {
       for (let pieceIndex = 0; pieceIndex < pieceList[piece]; pieceIndex++) {
-        let sourceSquare = pieceList.pieces[piece * 10 + pieceIndex];
+        let previousSquare = pieceList.pieces[piece * 10 + pieceIndex];
 
         // This will be for pawns
-        if (board[sourceSquare] == specialMoves.side[side].pawn) {
-          let targetSquare = sourceSquare + specialMoves.side[side].target;
+        if (board[previousSquare] == specialMoves.side[side].pawn) {
+          let nextSquare = previousSquare + specialMoves.side[side].target;
 
           // This will be for quiet moves
           // ==> Quiet moves are moves taht don't capture any pieces
-          if ((targetSquare & 0x88) == 0 && board[targetSquare] == e) {
+          if ((nextSquare & 0x88) == 0 && board[nextSquare] == e) {
             if (
-              sourceSquare >= specialMoves.side[side].rank7[0] &&
-              sourceSquare <= specialMoves.side[side].rank7[1]
+              previousSquare >= specialMoves.side[side].rank7[0] &&
+              previousSquare <= specialMoves.side[side].rank7[1]
             ) {
               for (let promotedIndex = 0; promotedIndex < 4; promotedIndex++) {
                 let promotedPiece =
@@ -924,8 +922,8 @@ var Engine = function (
                 addMove(
                   moveList,
                   encodeMove(
-                    sourceSquare,
-                    targetSquare,
+                    previousSquare,
+                    nextSquare,
                     promotedPiece,
                     0,
                     0,
@@ -937,19 +935,19 @@ var Engine = function (
             } else {
               addMove(
                 moveList,
-                encodeMove(sourceSquare, targetSquare, 0, 0, 0, 0, 0)
+                encodeMove(previousSquare, nextSquare, 0, 0, 0, 0, 0)
               );
               let doubleTarget =
-                sourceSquare + specialMoves.side[side].doubleTarget;
+                previousSquare + specialMoves.side[side].doubleTarget;
 
               if (
-                sourceSquare >= specialMoves.side[side].rank2[0] &&
-                sourceSquare <= specialMoves.side[side].rank2[1] &&
+                previousSquare >= specialMoves.side[side].rank2[0] &&
+                previousSquare <= specialMoves.side[side].rank2[1] &&
                 board[doubleTarget] == e
               )
                 addMove(
                   moveList,
-                  encodeMove(sourceSquare, doubleTarget, 0, 0, 1, 0, 0)
+                  encodeMove(previousSquare, doubleTarget, 0, 0, 1, 0, 0)
                 );
             }
           }
@@ -957,14 +955,14 @@ var Engine = function (
           // This will be for moves that capture pieces
           for (let index = 0; index < 2; index++) {
             let pawn_offset = specialMoves.side[side].offset[index];
-            let targetSquare = sourceSquare + pawn_offset;
+            let nextSquare = previousSquare + pawn_offset;
 
-            if ((targetSquare & 0x88) == 0) {
+            if ((nextSquare & 0x88) == 0) {
               if (
-                sourceSquare >= specialMoves.side[side].rank7[0] &&
-                sourceSquare <= specialMoves.side[side].rank7[1] &&
-                board[targetSquare] >= specialMoves.side[side].capture[0] &&
-                board[targetSquare] <= specialMoves.side[side].capture[1]
+                previousSquare >= specialMoves.side[side].rank7[0] &&
+                previousSquare <= specialMoves.side[side].rank7[1] &&
+                board[nextSquare] >= specialMoves.side[side].capture[0] &&
+                board[nextSquare] <= specialMoves.side[side].capture[1]
               ) {
                 for (
                   let promotedIndex = 0;
@@ -976,8 +974,8 @@ var Engine = function (
                   addMove(
                     moveList,
                     encodeMove(
-                      sourceSquare,
-                      targetSquare,
+                      previousSquare,
+                      nextSquare,
                       promotedPiece,
                       1,
                       0,
@@ -988,17 +986,17 @@ var Engine = function (
                 }
               } else {
                 if (
-                  board[targetSquare] >= specialMoves.side[side].capture[0] &&
-                  board[targetSquare] <= specialMoves.side[side].capture[1]
+                  board[nextSquare] >= specialMoves.side[side].capture[0] &&
+                  board[nextSquare] <= specialMoves.side[side].capture[1]
                 )
                   addMove(
                     moveList,
-                    encodeMove(sourceSquare, targetSquare, 0, 1, 0, 0, 0)
+                    encodeMove(previousSquare, nextSquare, 0, 1, 0, 0, 0)
                   );
-                if (targetSquare == enpassant)
+                if (nextSquare == enpassant)
                   addMove(
                     moveList,
-                    encodeMove(sourceSquare, targetSquare, 0, 1, 0, 1, 0)
+                    encodeMove(previousSquare, nextSquare, 0, 1, 0, 1, 0)
                   );
               }
             }
@@ -1006,7 +1004,7 @@ var Engine = function (
         }
 
         // This will be for castling moves
-        else if (board[sourceSquare] == specialMoves.side[side].king) {
+        else if (board[previousSquare] == specialMoves.side[side].king) {
           // This will be for the king side castles
           if (castle & specialMoves.side[side].castling[0]) {
             if (
@@ -1073,13 +1071,13 @@ var Engine = function (
 
         // This is for jumping pieces like the Knight and King
         for (let piece in jumpingPieces) {
-          if (board[sourceSquare] == jumpingPieces[piece].side[side]) {
+          if (board[previousSquare] == jumpingPieces[piece].side[side]) {
             for (let index = 0; index < 8; index++) {
-              let targetSquare =
-                sourceSquare + jumpingPieces[piece].offsets[index];
-              let capturedPiece = board[targetSquare];
+              let nextSquare =
+                previousSquare + jumpingPieces[piece].offsets[index];
+              let capturedPiece = board[nextSquare];
 
-              if ((targetSquare & 0x88) == 0) {
+              if ((nextSquare & 0x88) == 0) {
                 if (
                   side == white
                     ? capturedPiece == e ||
@@ -1090,12 +1088,12 @@ var Engine = function (
                   if (capturedPiece)
                     addMove(
                       moveList,
-                      encodeMove(sourceSquare, targetSquare, 0, 1, 0, 0, 0)
+                      encodeMove(previousSquare, nextSquare, 0, 1, 0, 0, 0)
                     );
                   else
                     addMove(
                       moveList,
-                      encodeMove(sourceSquare, targetSquare, 0, 0, 0, 0, 0)
+                      encodeMove(previousSquare, nextSquare, 0, 0, 0, 0, 0)
                     );
                 }
               }
@@ -1106,14 +1104,14 @@ var Engine = function (
         // This will be for sniper pieces such as the Rook and Bishop
         for (let piece in sniperPieces) {
           if (
-            board[sourceSquare] == sniperPieces[piece].side[side][0] ||
-            board[sourceSquare] == sniperPieces[piece].side[side][1]
+            board[previousSquare] == sniperPieces[piece].side[side][0] ||
+            board[previousSquare] == sniperPieces[piece].side[side][1]
           ) {
             for (var index = 0; index < 4; index++) {
-              let targetSquare =
-                sourceSquare + sniperPieces[piece].offsets[index];
-              while (!(targetSquare & 0x88)) {
-                var capturedPiece = board[targetSquare];
+              let nextSquare =
+                previousSquare + sniperPieces[piece].offsets[index];
+              while (!(nextSquare & 0x88)) {
+                var capturedPiece = board[nextSquare];
 
                 if (
                   side == white
@@ -1128,7 +1126,7 @@ var Engine = function (
                 ) {
                   addMove(
                     moveList,
-                    encodeMove(sourceSquare, targetSquare, 0, 1, 0, 0, 0)
+                    encodeMove(previousSquare, nextSquare, 0, 1, 0, 0, 0)
                   );
                   break;
                 }
@@ -1136,9 +1134,9 @@ var Engine = function (
                 if (capturedPiece == e)
                   addMove(
                     moveList,
-                    encodeMove(sourceSquare, targetSquare, 0, 0, 0, 0, 0)
+                    encodeMove(previousSquare, nextSquare, 0, 0, 0, 0, 0)
                   );
-                targetSquare += sniperPieces[piece].offsets[index];
+                nextSquare += sniperPieces[piece].offsets[index];
               }
             }
           }
@@ -1151,21 +1149,21 @@ var Engine = function (
   function generateCaptures(moveList) {
     for (let piece = P; piece <= k; piece++) {
       for (let pieceIndex = 0; pieceIndex < pieceList[piece]; pieceIndex++) {
-        let sourceSquare = pieceList.pieces[piece * 10 + pieceIndex];
+        let previousSquare = pieceList.pieces[piece * 10 + pieceIndex];
 
         // If the piece is a pawn
-        if (board[sourceSquare] == specialMoves.side[side].pawn) {
-          let targetSquare = sourceSquare + specialMoves.side[side].target;
+        if (board[previousSquare] == specialMoves.side[side].pawn) {
+          let nextSquare = previousSquare + specialMoves.side[side].target;
           for (let index = 0; index < 2; index++) {
             let pawn_offset = specialMoves.side[side].offset[index];
-            let targetSquare = sourceSquare + pawn_offset;
+            let nextSquare = previousSquare + pawn_offset;
 
-            if ((targetSquare & 0x88) == 0) {
+            if ((nextSquare & 0x88) == 0) {
               if (
-                sourceSquare >= specialMoves.side[side].rank7[0] &&
-                sourceSquare <= specialMoves.side[side].rank7[1] &&
-                board[targetSquare] >= specialMoves.side[side].capture[0] &&
-                board[targetSquare] <= specialMoves.side[side].capture[1]
+                previousSquare >= specialMoves.side[side].rank7[0] &&
+                previousSquare <= specialMoves.side[side].rank7[1] &&
+                board[nextSquare] >= specialMoves.side[side].capture[0] &&
+                board[nextSquare] <= specialMoves.side[side].capture[1]
               ) {
                 for (
                   let promotedIndex = 0;
@@ -1177,8 +1175,8 @@ var Engine = function (
                   addMove(
                     moveList,
                     encodeMove(
-                      sourceSquare,
-                      targetSquare,
+                      previousSquare,
+                      nextSquare,
                       promotedPiece,
                       1,
                       0,
@@ -1189,17 +1187,17 @@ var Engine = function (
                 }
               } else {
                 if (
-                  board[targetSquare] >= specialMoves.side[side].capture[0] &&
-                  board[targetSquare] <= specialMoves.side[side].capture[1]
+                  board[nextSquare] >= specialMoves.side[side].capture[0] &&
+                  board[nextSquare] <= specialMoves.side[side].capture[1]
                 )
                   addMove(
                     moveList,
-                    encodeMove(sourceSquare, targetSquare, 0, 1, 0, 0, 0)
+                    encodeMove(previousSquare, nextSquare, 0, 1, 0, 0, 0)
                   );
-                if (targetSquare == enpassant)
+                if (nextSquare == enpassant)
                   addMove(
                     moveList,
-                    encodeMove(sourceSquare, targetSquare, 0, 1, 0, 1, 0)
+                    encodeMove(previousSquare, nextSquare, 0, 1, 0, 1, 0)
                   );
               }
             }
@@ -1208,13 +1206,13 @@ var Engine = function (
 
         // If the piece is a jumping piece like the king or knight
         for (let piece in jumpingPieces) {
-          if (board[sourceSquare] == jumpingPieces[piece].side[side]) {
+          if (board[previousSquare] == jumpingPieces[piece].side[side]) {
             for (let index = 0; index < 8; index++) {
-              let targetSquare =
-                sourceSquare + jumpingPieces[piece].offsets[index];
-              let capturedPiece = board[targetSquare];
+              let nextSquare =
+                previousSquare + jumpingPieces[piece].offsets[index];
+              let capturedPiece = board[nextSquare];
 
-              if ((targetSquare & 0x88) == 0) {
+              if ((nextSquare & 0x88) == 0) {
                 if (
                   side == white
                     ? capturedPiece == e ||
@@ -1225,7 +1223,7 @@ var Engine = function (
                   if (capturedPiece)
                     addMove(
                       moveList,
-                      encodeMove(sourceSquare, targetSquare, 0, 1, 0, 0, 0)
+                      encodeMove(previousSquare, nextSquare, 0, 1, 0, 0, 0)
                     );
                 }
               }
@@ -1236,14 +1234,14 @@ var Engine = function (
         // This will be for sniper pieces like the rook and bishop
         for (let piece in sniperPieces) {
           if (
-            board[sourceSquare] == sniperPieces[piece].side[side][0] ||
-            board[sourceSquare] == sniperPieces[piece].side[side][1]
+            board[previousSquare] == sniperPieces[piece].side[side][0] ||
+            board[previousSquare] == sniperPieces[piece].side[side][1]
           ) {
             for (var index = 0; index < 4; index++) {
-              let targetSquare =
-                sourceSquare + sniperPieces[piece].offsets[index];
-              while (!(targetSquare & 0x88)) {
-                var capturedPiece = board[targetSquare];
+              let nextSquare =
+                previousSquare + sniperPieces[piece].offsets[index];
+              while (!(nextSquare & 0x88)) {
+                var capturedPiece = board[nextSquare];
 
                 if (
                   side == white
@@ -1258,12 +1256,12 @@ var Engine = function (
                 ) {
                   addMove(
                     moveList,
-                    encodeMove(sourceSquare, targetSquare, 0, 1, 0, 0, 0)
+                    encodeMove(previousSquare, nextSquare, 0, 1, 0, 0, 0)
                   );
                   break;
                 }
 
-                targetSquare += sniperPieces[piece].offsets[index];
+                nextSquare += sniperPieces[piece].offsets[index];
               }
             }
           }
@@ -1289,16 +1287,16 @@ var Engine = function (
     return legalMoves;
   }
 
-  // This function will move the current piece from the intial square to the square it wants to go to (targetSquare)
-  function moveCurrentPiece(piece, sourceSquare, targetSquare) {
-    board[targetSquare] = board[sourceSquare];
-    board[sourceSquare] = e;
-    hashKey ^= pieceKeys[piece * 128 + sourceSquare];
-    hashKey ^= pieceKeys[piece * 128 + targetSquare];
+  // This function will move the current piece from the intial square to the square it wants to go to (nextSquare)
+  function moveCurrentPiece(piece, previousSquare, nextSquare) {
+    board[nextSquare] = board[previousSquare];
+    board[previousSquare] = e;
+    hashKey ^= pieceKeys[piece * 128 + previousSquare];
+    hashKey ^= pieceKeys[piece * 128 + nextSquare];
 
     for (let pieceIndex = 0; pieceIndex < pieceList[piece]; pieceIndex++) {
-      if (pieceList.pieces[piece * 10 + pieceIndex] == sourceSquare) {
-        pieceList.pieces[piece * 10 + pieceIndex] = targetSquare;
+      if (pieceList.pieces[piece * 10 + pieceIndex] == previousSquare) {
+        pieceList.pieces[piece * 10 + pieceIndex] = nextSquare;
         break;
       }
     }
@@ -1336,13 +1334,13 @@ var Engine = function (
     repetitionTable[gameOne] = hashKey;
 
     // This is parsing the moves to a string
-    let sourceSquare = getMoveSource(move);
-    let targetSquare = getMoveTarget(move);
+    let previousSquare = getMoveSource(move);
+    let nextSquare = getMoveTarget(move);
     let promotedPiece = getMovePromoted(move);
-    let capturedPiece = board[targetSquare];
+    let capturedPiece = board[nextSquare];
 
-    // This is the movestack board state variables
-    moveStack.push({
+    // This is the movesStack board state variables
+    movesStack.push({
       move: move,
       capturedPiece: 0,
       side: side,
@@ -1353,7 +1351,7 @@ var Engine = function (
     });
 
     // This moves the current piece from the source square to the target square
-    moveCurrentPiece(board[sourceSquare], sourceSquare, targetSquare);
+    moveCurrentPiece(board[previousSquare], previousSquare, nextSquare);
 
     // This is updating the fifty move rule
     fifty++;
@@ -1361,14 +1359,14 @@ var Engine = function (
     // If the current piece is capturing something, this will remove the captured piece from the board
     if (getMoveCapture(move)) {
       if (capturedPiece) {
-        moveStack[moveStack.length - 1].capturedPiece = capturedPiece;
-        hashKey ^= pieceKeys[capturedPiece * 128 + targetSquare];
-        removePiece(capturedPiece, targetSquare);
+        movesStack[movesStack.length - 1].capturedPiece = capturedPiece;
+        hashKey ^= pieceKeys[capturedPiece * 128 + nextSquare];
+        removePiece(capturedPiece, nextSquare);
       }
       fifty = 0;
     }
     // In the case that the piece is a pawn, this will assign the fifty move rule value back to 0
-    else if (board[targetSquare] == P || board[targetSquare] == p) fifty = 0;
+    else if (board[nextSquare] == P || board[nextSquare] == p) fifty = 0;
 
     // This is updating the enpassant square
     if (enpassant != noEnpassant) hashKey ^= pieceKeys[enpassant];
@@ -1378,33 +1376,33 @@ var Engine = function (
     if (getMovePawn(move)) {
       // If the side is white and the piece is a pawn
       if (side == white) {
-        enpassant = targetSquare + 16;
-        hashKey ^= pieceKeys[targetSquare + 16];
+        enpassant = nextSquare + 16;
+        hashKey ^= pieceKeys[nextSquare + 16];
       }
       // If the side is black and the piece is a pawn
       else {
-        enpassant = targetSquare - 16;
-        hashKey ^= pieceKeys[targetSquare - 16];
+        enpassant = nextSquare - 16;
+        hashKey ^= pieceKeys[nextSquare - 16];
       }
     }
     // This is checking whether the move with the pawn was enpassant
     else if (getMoveEnpassant(move)) {
       // enpassant for white
       if (side == white) {
-        board[targetSquare + 16] = e;
-        hashKey ^= pieceKeys[p * 128 + targetSquare + 16];
-        removePiece(p, targetSquare + 16);
+        board[nextSquare + 16] = e;
+        hashKey ^= pieceKeys[p * 128 + nextSquare + 16];
+        removePiece(p, nextSquare + 16);
       }
       // enpassant for black
       else {
-        board[targetSquare - 16] = e;
-        hashKey ^= pieceKeys[P * 128 + (targetSquare - 16)];
-        removePiece(P, targetSquare - 16);
+        board[nextSquare - 16] = e;
+        hashKey ^= pieceKeys[P * 128 + (nextSquare - 16)];
+        removePiece(P, nextSquare - 16);
       }
     }
     // If the move was a castle
     else if (getMoveCastling(move)) {
-      switch (targetSquare) {
+      switch (nextSquare) {
         case g1:
           moveCurrentPiece(R, h1, f1);
           break;
@@ -1425,30 +1423,30 @@ var Engine = function (
       // If the side that is promoting is white
       if (side == white) {
         // Updating the hash key
-        hashKey ^= pieceKeys[P * 128 + targetSquare];
-        removePiece(P, targetSquare);
+        hashKey ^= pieceKeys[P * 128 + nextSquare];
+        removePiece(P, nextSquare);
         // We want to remove the white pawn from the square it was last on
       }
       // If the side that is promoting is black
       else {
         // Updating the hash key
-        hashKey ^= pieceKeys[p * 128 + targetSquare];
+        hashKey ^= pieceKeys[p * 128 + nextSquare];
         // We want to remove the black pawn from the square it was last on
-        removePiece(p, targetSquare);
+        removePiece(p, nextSquare);
       }
       // Adding the promoted piece to the ssquare the pawn was last on
       // The promoted piece will depend on the user's settings
-      addPiece(promotedPiece, targetSquare);
+      addPiece(promotedPiece, nextSquare);
     }
 
     // Here we are updating the king square
-    if (board[targetSquare] == K || board[targetSquare] == k)
-      kingSquare[side] = targetSquare;
+    if (board[nextSquare] == K || board[nextSquare] == k)
+      kingSquare[side] = nextSquare;
 
     // Updating castle rights
     hashKey ^= castleKeys[castle];
-    castle &= castlingRights[sourceSquare];
-    castle &= castlingRights[targetSquare];
+    castle &= castlingRights[previousSquare];
+    castle &= castlingRights[nextSquare];
     hashKey ^= castleKeys[castle];
 
     // Switching the side to move
@@ -1474,32 +1472,32 @@ var Engine = function (
     gameOne--;
 
     // Parsing the move to a string
-    let moveIndex = moveStack.length - 1;
-    let move = moveStack[moveIndex].move;
-    let sourceSquare = getMoveSource(move);
-    let targetSquare = getMoveTarget(move);
+    let moveIndex = movesStack.length - 1;
+    let move = movesStack[moveIndex].move;
+    let previousSquare = getMoveSource(move);
+    let nextSquare = getMoveTarget(move);
 
     // Moving the piece from the source square to the target square
-    moveCurrentPiece(board[targetSquare], targetSquare, sourceSquare);
+    moveCurrentPiece(board[nextSquare], nextSquare, previousSquare);
 
     // This restores the captured piece
     if (getMoveCapture(move)) {
       // If a piece was captured, we want to add it back to the board
-      addPiece(moveStack[moveIndex].capturedPiece, targetSquare);
+      addPiece(movesStack[moveIndex].capturedPiece, nextSquare);
     }
 
     // This is handling special moves if a move was taken back
     // If the move was enppassant
     if (getMoveEnpassant(move)) {
       // We check if the side was white
-      if (side == white) addPiece(P, targetSquare - 16);
+      if (side == white) addPiece(P, nextSquare - 16);
       // If it was, we add a black pawn to the square that was captured
-      else addPiece(p, targetSquare + 16);
+      else addPiece(p, nextSquare + 16);
     }
     // If the move was a castle
     else if (getMoveCastling(move)) {
       // We make a switch case to handle the different castling moves, depending on whether it was queen side, king side, and the side that was castling
-      switch (targetSquare) {
+      switch (nextSquare) {
         // In the case that the move was a king side castle for white
         case g1:
           moveCurrentPiece(R, f1, h1); // We move the rook back to its original square
@@ -1521,31 +1519,31 @@ var Engine = function (
     // Here we check if the move was a promotion
     else if (getMovePromoted(move)) {
       // If the side was white, we add a pawn back to the square before the promotion and if it was black, we add a pawn to the square before the promotion
-      side == white ? addPiece(p, sourceSquare) : addPiece(P, sourceSquare);
+      side == white ? addPiece(p, previousSquare) : addPiece(P, previousSquare);
       // Then we remove the promoted piece
-      removePiece(getMovePromoted(move), sourceSquare);
+      removePiece(getMovePromoted(move), previousSquare);
     }
 
     // Here we are updating the king square
-    if (board[sourceSquare] == K || board[sourceSquare] == k)
-      kingSquare[side ^ 1] = sourceSquare;
+    if (board[previousSquare] == K || board[previousSquare] == k)
+      kingSquare[side ^ 1] = previousSquare;
 
     // Here we are switching the side to move
-    side = moveStack[moveIndex].side;
+    side = movesStack[moveIndex].side;
 
     // Restoring the board state variables
-    enpassant = moveStack[moveIndex].enpassant;
-    castle = moveStack[moveIndex].castle;
-    hashKey = moveStack[moveIndex].hash;
-    fifty = moveStack[moveIndex].fifty;
+    enpassant = movesStack[moveIndex].enpassant;
+    castle = movesStack[moveIndex].castle;
+    hashKey = movesStack[moveIndex].hash;
+    fifty = movesStack[moveIndex].fifty;
 
-    moveStack.pop();
+    movesStack.pop();
   }
 
   // This function will make a null move
   function makeNullMove() {
     // This is backing up the current board state
-    moveStack.push({
+    movesStack.push({
       move: 0,
       capturedPiece: 0,
       side: side,
@@ -1562,15 +1560,15 @@ var Engine = function (
     hashKey ^= sideKey;
   }
 
-  // This function wil ltake a null move
+  // This function will make a null move
   function takeNullMove() {
-    // Restroring the board state
-    side = moveStack[moveStack.length - 1].side;
-    enpassant = moveStack[moveStack.length - 1].enpassant;
-    castle = moveStack[moveStack.length - 1].castle;
-    fifty = moveStack[moveStack.length - 1].fifty;
-    hashKey = moveStack[moveStack.length - 1].hash;
-    moveStack.pop();
+    // Restoring the board state
+    side = movesStack[movesStack.length - 1].side;
+    enpassant = movesStack[movesStack.length - 1].enpassant;
+    castle = movesStack[movesStack.length - 1].castle;
+    fifty = movesStack[movesStack.length - 1].fifty;
+    hashKey = movesStack[movesStack.length - 1].hash;
+    movesStack.pop();
   }
 
   /*
@@ -3880,7 +3878,7 @@ var Engine = function (
       return isMaterialDraw();
     },
     takeBack: function () {
-      if (moveStack.length) takeBack();
+      if (movesStack.length) takeBack();
     },
     isRepetition: function () {
       return isRepetition();

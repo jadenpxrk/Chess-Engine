@@ -1,5 +1,5 @@
 // Initializing the chess engine
-var engine = new Engine();
+var engine = new chessEngine();
 
 // These are the user's inputed controls
 var backgroundLock = 0;
@@ -186,16 +186,16 @@ function think() {
   let bestMove = engine.search(64);
 
   // The source square is the square where the piece was initally located
-  let sourceSquare = engine.getMoveSource(bestMove);
+  let previousSquare = engine.getMoveSource(bestMove);
 
   // The target square is the square where the piece will be moved to
-  let targetSquare = engine.getMoveTarget(bestMove);
+  let nextSquare = engine.getMoveTarget(bestMove);
 
   // The promoted piece is the piece that the pawn will be promoted to depending on the user's settings
   let promotedPiece = engine.getMovePromoted(bestMove);
 
   // This moves the piece from the source square to the target square and if the piece is promoting, it will turn the initial piece to the promoted piece
-  engine.movePiece(sourceSquare, targetSquare, promotedPiece);
+  engine.movePiece(previousSquare, nextSquare, promotedPiece);
 
   // The following boolean statements will be checking whether the game is ending
   if (engine.isRepetition()) repetitions++;
@@ -237,9 +237,8 @@ function think() {
   }
 
   // After all these checks have been done, the target square will be highlighted to show the move has been made
-  if (engine.getPiece(targetSquare))
-    document.getElementById(sourceSquare).style.backgroundColor =
+  if (engine.getPiece(nextSquare))
+    document.getElementById(previousSquare).style.backgroundColor =
       engine.PREV_COLOR;
-  document.getElementById(targetSquare).style.backgroundColor =
-    engine.NEXT_COLOR;
+  document.getElementById(nextSquare).style.backgroundColor = engine.NEXT_COLOR;
 }
