@@ -1,5 +1,8 @@
 # Chess-Engine
 
+![chess-engine](https://user-images.githubusercontent.com/78674944/209627773-6a2f4a19-2230-494c-8e25-6377d3531de1.png)
+
+
 ## About
 A chess engine based on the Negamax algorithm with up to 10th depth game analysis. (if given enough time)
 
