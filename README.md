@@ -1,7 +1,7 @@
 # Chess-Engine
 
 ## About
-A chess engine based on the Negamax algorithm with up to 10th depth game analysis. Utilizes alpha-beta pruning, the Principal variation search and the Quiescence search algorithms to find the next best move in a position. 
+A chess engine based on the Negamax algorithm with up to 10th depth game analysis. Utilizes alpha-beta pruning, Principal variation search and the Quiescence search algorithms to find the next best move in a position. 
 
 ## Features
 - Negamax algorithm with alpha-beta pruning
