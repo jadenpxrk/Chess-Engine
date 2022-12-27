@@ -494,7 +494,7 @@ var chessEngine = function (
   }
 
   // The function is initializing the piece list
-  function initPieceList() {
+  function initializePieceList() {
     // This resets the piece counts
     for (var piece = P; piece <= k; piece++) pieceList[piece] = 0;
 
@@ -3431,7 +3431,7 @@ var chessEngine = function (
     hashKey = generateHashKey();
 
     // Initialize the piece list
-    initPieceList();
+    initializePieceList();
   }
 
   // This function will load more move sequences
@@ -3680,7 +3680,7 @@ var chessEngine = function (
   (function initAll() {
     initRandomKeys();
     hashKey = generateHashKey();
-    initPieceList();
+    initializePieceList();
   })();
 
   return {
