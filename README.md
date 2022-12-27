@@ -12,7 +12,7 @@ A chess engine based on the Negamax algorithm with up to 10th depth game analysi
 - Piece-square tables
 
 
-GUI includes undoing moves, flipping and resetting the board, under promotions, custom board positions and evaluation times.
+GUI includes undoing moves, flipping and resetting the board, under promotions, and custom board positions and evaluation times.
 
 ## Possible Improvements
 - Switching programming languages
