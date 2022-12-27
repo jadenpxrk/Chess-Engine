@@ -1,0 +1,84 @@
+<html>
+  <head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
+    <meta content="utf-8" http-equiv="encoding" />
+    <title>Chess Engine</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css" />
+  </head>
+  <body
+    style="
+      font-size: 16px;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    "
+    class="text-center"
+  >
+    <container>
+      <h4 style="font-weight: 500">Chess Engine</h4>
+      <div class="input-group mx-auto mt-2 mb-2" style="width: 600px">
+        <input id="fen" type="text" class="form-control rounded me-2" />
+        <div class="input-group-append">
+          <button onclick="setFen();" class="btn btn-outline-success">
+            Set FEN
+          </button>
+        </div>
+      </div>
+      <div id="chessboard"></div>
+      <div class="btn-group mt-2" style="width: 600px">
+        <button
+          class="btn btn-outline-danger rounded me-2"
+          onclick="resetGame();"
+        >
+          Reset
+        </button>
+        <button class="btn btn-outline-primary rounded me-2" onclick="flip()">
+          Flip Board
+        </button>
+        <button class="btn btn-outline-primary rounded me-2" onclick="think();">
+          AI Move
+        </button>
+        <button
+          class="btn btn-outline-primary rounded me-2"
+          onclick="undoMove();"
+        >
+          Take Back
+        </button>
+        <select
+          id="movetime"
+          class="btn btn-outline-secondary col-2 rounded me-2 text-center"
+          style="appearance: none"
+        >
+          <option value="1">1 sec</option>
+          <option value="3">3 sec</option>
+          <option value="5">5 sec</option>
+          <option value="10">10 sec</option>
+          <option value="20">20 sec</option>
+          <option value="30">30 sec</option>
+          <option value="60">60 sec</option>
+        </select>
+        <select
+          id="promoted"
+          class="btn btn-outline-secondary rounded col-2 text-center"
+          style="appearance: none"
+        >
+          <option value="5">Queen</option>
+          <option value="4">Rook</option>
+          <option value="3">Bishop</option>
+          <option value="2">Knight</option>
+        </select>
+      </div>
+
+      <!-- Info -->
+      <div class="row mx-auto mt-2" style="width: 600px">
+        <div class="col text-center">
+          Search Depth:
+          <span id="depth" class="font-weight-bold ml-2">~</span>
+        </div>
+      </div>
+    </container>
+  </body>
+  <script src="js/engine.js"></script>
+  <script src="js/user.js"></script>
+</html>
