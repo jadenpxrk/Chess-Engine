@@ -20,9 +20,8 @@ A chess engine based on the Negamax algorithm with up to 10th depth game analysi
 GUI includes undoing moves, flipping and resetting the board, under promotions, and custom board positions and evaluation times.
 
 ## Possible Improvements
-- Switching programming languages
-- Using a better evaluation method
-- Opening Tables
+- Switching programming languages 
+- Using a more detailed evaluation method (ex. use of opening tables)
 
 
 #### You can play it [here](https://jaehyeong-chess-engine.netlify.app/)
