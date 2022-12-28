@@ -431,7 +431,6 @@ var chessEngine = function (
   }
 
   // Zoborist hashing
-
   // Initializing random keys
   var pieceKeys = new Array(13 * 128);
   var castleKeys = new Array(16);
@@ -3650,9 +3649,10 @@ var chessEngine = function (
           var square = row * 16 + col;
           if ((square & 0x88) == 0)
             document.getElementById(square).innerHTML =
-              '<img style="width: 140px' +
+              "<img " +
               (sizeOfBoard ? sizeOfBoard / 8 : 400 / 8) +
               'px" draggable="true" src ="Images/' +
+              // Reason why images are called numbers
               board[square] +
               '.gif">';
         }
