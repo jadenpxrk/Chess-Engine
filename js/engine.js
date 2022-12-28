@@ -430,7 +430,7 @@ var chessEngine = function (
     return number;
   }
 
-  // Zoborist hashing and creating transpostion tables
+  // Zoborist hashing
 
   // Initializing random keys
   var pieceKeys = new Array(13 * 128);
