@@ -24,4 +24,4 @@ GUI includes undoing moves, flipping and resetting the board, under promotions, 
 - Using a more detailed evaluation method (ex. use of opening tables)
 - Transposition Tables
 
-#### You can play it [here](https://jaehyeong-chess-engine.netlify.app/)
+#### You can play against it [here](https://jaehyeong-chess-engine.netlify.app/)
