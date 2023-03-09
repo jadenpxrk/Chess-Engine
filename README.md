@@ -18,6 +18,7 @@ A chess engine based on the Negamax algorithm with up to 10th depth game analysi
 - Principal variation search
 - Quiescence search
 - Zobrist hashing
+- Transposition Tables
 
 GUI includes undoing moves, flipping and resetting the board, under promotions, and custom board positions and evaluation times.
 
@@ -25,6 +26,5 @@ GUI includes undoing moves, flipping and resetting the board, under promotions, 
 
 - Switching programming languages
 - Using a more detailed evaluation method (ex. use of opening tables)
-- Transposition Tables
 
 #### You can play against it [here](https://jaehyeong-chess-engine.netlify.app/)
