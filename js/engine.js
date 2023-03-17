@@ -2725,7 +2725,7 @@ var chessEngine = function (
     return phaseScore > 2460 ? 0 : 1;
   }
 
-  // This is the STATIC evaluation function for the engine
+  // This is the STATIC evaluation function for the engine ==> determining who's winning
   function evaluate() {
     // We will be calling the isMaterialDraw function to check if the game is a draw by insufficient material
     // If this function returns true, we return 0 or in other words tell the engine not to evaluate a move as the game is over
@@ -3332,23 +3332,6 @@ var chessEngine = function (
     k: k,
   };
 
-  // Unicode piece representation
-  const unicodePieces = [
-    ".",
-    "\u2659",
-    "\u2658",
-    "\u2657",
-    "\u2656",
-    "\u2655",
-    "\u2654",
-    "\u265F",
-    "\u265E",
-    "\u265D",
-    "\u265C",
-    "\u265B",
-    "\u265A",
-  ];
-
   // Setting the board position from FEN
   function setBoard(fen) {
     resetBoard();
@@ -3439,7 +3422,6 @@ var chessEngine = function (
 
     for (let index = 0; index < moves.length; index++) {
       let move = moves[index];
-      let moveString = moves[index];
       let validMove = moveFromString(move);
       if (validMove) makeMove(validMove);
     }
@@ -3447,43 +3429,7 @@ var chessEngine = function (
     searchOne = 0;
   }
 
-  // This function will print the chess board to console
-  function printBoard() {
-    var boardString = "";
-
-    // Printing the board position
-    for (var rank = 0; rank < 8; rank++) {
-      for (var file = 0; file < 16; file++) {
-        var square = rank * 16 + file;
-        if (file == 0) boardString += "   " + (8 - rank).toString() + " ";
-        if ((square & 0x88) == 0)
-          boardString += unicodePieces[board[square]] + " ";
-      }
-      boardString += "\n";
-    }
-
-    boardString += "     a b c d e f g h";
-
-    // Printing the board state variables
-    boardString += "\n\n     Side:     " + (side == 0 ? "white" : "black");
-    boardString +=
-      "\n     Castling:  " +
-      (castle & KC ? "K" : "-") +
-      (castle & QC ? "Q" : "-") +
-      (castle & kc ? "k" : "-") +
-      (castle & qc ? "q" : "-");
-    boardString +=
-      "\n     Ep:          " +
-      (enpassant == noEnpassant ? "no" : coordinates[enpassant]);
-    boardString += "\n\n     Key: " + hashKey;
-    boardString += "\n 50 rule:          " + fifty;
-    boardString +=
-      "\n   moves:          " +
-      (gameOne % 2 ? Math.round(gameOne / 2) - 1 : Math.round(gameOne / 2));
-    console.log(boardString + "\n");
-  }
-
-  // This function will print the move
+  // This function will make the move visible on the board GUI
   function moveToString(move) {
     if (getMovePromoted(move)) {
       return (
@@ -3498,63 +3444,6 @@ var chessEngine = function (
     }
   }
 
-  // This function will print the move list
-  function printMoveList(moveList) {
-    var listMoves =
-      "   Move     Capture  Double   Enpass   Castling  Score\n\n";
-
-    for (var index = 0; index < moveList.length; index++) {
-      var move = moveList[index].move;
-      listMoves +=
-        "   " +
-        coordinates[getMoveSource(move)] +
-        coordinates[getMoveTarget(move)];
-      listMoves += getMovePromoted(move)
-        ? promotedPieces[getMovePromoted(move)]
-        : " ";
-      listMoves +=
-        "    " +
-        getMoveCapture(move) +
-        "        " +
-        getMovePawn(move) +
-        "        " +
-        getMoveEnpassant(move) +
-        "        " +
-        getMoveCastling(move) +
-        "         " +
-        moveList[index].score +
-        "\n";
-    }
-
-    listMoves += "\n   Total moves: " + moveList.length;
-    console.log(listMoves);
-  }
-
-  // This function will print the piece list & material counts
-  function printPieceList() {
-    var materialCountString = "    Material counts:\n\n";
-
-    // print material count
-    for (var piece = P; piece <= k; piece++)
-      materialCountString +=
-        "    " + unicodePieces[piece] + ": " + pieceList[piece] + "\n";
-
-    console.log(materialCountString);
-    var pieceListString = "    Piece list:\n\n";
-
-    // print piece-square pairs
-    for (var piece = P; piece <= k; piece++)
-      for (var pieceNumber = 0; pieceNumber < pieceList[piece]; pieceNumber++)
-        pieceListString +=
-          "    " +
-          unicodePieces[piece] +
-          ": " +
-          coordinates[pieceList.pieces[piece * 10 + pieceNumber]] +
-          "\n";
-
-    console.log(pieceListString);
-  }
-
   // The color theme for the GUI/board
   if (typeof document != "undefined") {
     // Color theme
@@ -3565,8 +3454,8 @@ var chessEngine = function (
     var PREV_COLOR = "#E16A55";
 
     // Square size
-    var CELL_WIDTH = 75;
-    var CELL_HEIGHT = 75;
+    var CELL_WIDTH = 70;
+    var CELL_HEIGHT = 70;
 
     // Overriding board appearance
     if (sizeOfBoard) {
@@ -3651,7 +3540,7 @@ var chessEngine = function (
             document.getElementById(square).innerHTML =
               "<img " +
               (sizeOfBoard ? sizeOfBoard / 8 : 400 / 8) +
-              'px" draggable="true" src ="Images/' +
+              'px" draggable="true" src ="images/' +
               // Reason why images are called numbers
               board[square] +
               '.gif">';
@@ -3854,9 +3743,6 @@ var chessEngine = function (
     },
     generateLegalMoves: function () {
       return generateLegalMoves();
-    },
-    printMoveList: function (moveList) {
-      printMoveList(moveList);
     },
 
     // Time Functions
