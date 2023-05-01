@@ -3454,8 +3454,8 @@ var chessEngine = function (
     var PREV_COLOR = "#E16A55";
 
     // Square size
-    var CELL_WIDTH = 70;
-    var CELL_HEIGHT = 70;
+    var CELL_WIDTH = 75;
+    var CELL_HEIGHT = 75;
 
     // Overriding board appearance
     if (sizeOfBoard) {
@@ -3540,8 +3540,8 @@ var chessEngine = function (
             document.getElementById(square).innerHTML =
               "<img " +
               (sizeOfBoard ? sizeOfBoard / 8 : 400 / 8) +
-              'px" draggable="true" src ="images/' +
-              // Reason why images are called numbers
+              'px" draggable="true" src ="imgs/' +
+              // Numbered Images
               board[square] +
               '.gif">';
         }

@@ -18,7 +18,7 @@ function dragPiece(event, square) {
 function dragOver(event, square) {
   event.preventDefault();
   // If the user is dragging a piece, then the background color of the initial square will change
-  if (square == userSource) event.target.src = "Images/0.gif";
+  if (square == userSource) event.target.src = "imgs/0.gif";
 }
 
 // This function is the drag piece handler
