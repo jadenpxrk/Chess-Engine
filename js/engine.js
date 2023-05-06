@@ -242,7 +242,7 @@ var chessEngine = function (
 
   // The following variables will be for the chess board
 
-  // The FEN (Forsyth-Edwards Notation) of the starting board looks like this
+  // The FEN (Forsyth-Edwards Notation) of the starting board
   const startFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 ";
 
   // This is our chess board represented by a 1D array where e's represent empty squares and o's represent squares off the board as mentioned earlier
@@ -515,6 +515,7 @@ var chessEngine = function (
   }
 
   // This function is validating the moves
+  // @param moveString - The move string
   function moveFromString(moveString) {
     let moveList = [];
     generateMoves(moveList);
@@ -581,6 +582,8 @@ var chessEngine = function (
   // The following will check for potential attacks
 
   // This function will check if a square is being attacked and what it is being attacked by
+  // @param square - The square to check
+  // @param side - The side to check
   function isSquareAttacked(square, side) {
     // If it is being attacked by pawns
     for (let index = 0; index < 2; index++) {
@@ -621,6 +624,13 @@ var chessEngine = function (
   // The following will be for move encoding
 
   // This function will encode a move
+  // @param source - The source square
+  // @param target - The target square
+  // @param piece - The piece moved
+  // @param capture - The piece that was captured
+  // @param pawn - pawn promotion
+  // @param enpassant - enpassant rights
+  // @param castling - castling rights
   function encodeMove(
     source,
     target,
@@ -877,6 +887,8 @@ var chessEngine = function (
   ];
 
   // This function will be adding moves to a move list
+  // @param moveList - the list to add moves to
+  // @param move - the move to add
   function addMove(moveList, move) {
     let moveScore = 0;
 
@@ -899,6 +911,7 @@ var chessEngine = function (
   }
 
   // This function will be generating moves for the AI's sides
+  // @param moveList - the list to add moves to
   function generateMoves(moveList) {
     for (let piece = P; piece <= k; piece++) {
       for (let pieceIndex = 0; pieceIndex < pieceList[piece]; pieceIndex++) {
@@ -1145,6 +1158,7 @@ var chessEngine = function (
   }
 
   // This function will be generating captures for the AI
+  // @param moveList - The list of moves
   function generateCaptures(moveList) {
     for (let piece = P; piece <= k; piece++) {
       for (let pieceIndex = 0; pieceIndex < pieceList[piece]; pieceIndex++) {
@@ -2892,6 +2906,8 @@ var chessEngine = function (
   }
 
   // This function will control which the order in which moves will be made
+  // @param currentCount - The current move count
+  // @parma moveList - The list of moves
   function sortMoves(currentCount, moveList) {
     for (
       let nextCount = currentCount + 1;
@@ -2910,6 +2926,7 @@ var chessEngine = function (
   }
 
   // This is sorting the PV (principal variation) moves
+  // @parma moveList - The list of moves
   function sortPVMoves(moveList) {
     // Checking if followPV is equal to 1 or true
     if (followPV) {
@@ -2931,6 +2948,7 @@ var chessEngine = function (
   }
 
   // This function will be responsible for storing the PV Moves
+  // @param move - The move to be stored
   function storePVMoves(move) {
     // Setting the PV table at the current search depth to the move
     pvTable[searchOne * 64 + searchOne] = move;
@@ -2945,7 +2963,9 @@ var chessEngine = function (
     pvLength[searchOne] = pvLength[searchOne + 1];
   }
 
-  // This function will be responsivle for the Queiscence search
+  // This function will be responsible for the Queiscence search
+  // @param alpha - The alpha value
+  // @param beta - The beta value
   function Queiscence(alpha, beta) {
     pvLength[searchOne] = searchOne;
     // Increment the nodes searched by one
@@ -3009,6 +3029,10 @@ var chessEngine = function (
   }
 
   // This function will be our Negamax Search
+  // @param alpha - The alpha value
+  // @param beta - The beta value
+  // @param depth - The depth of the search
+  // @param nullMove - The null move
   function Negamax(alpha, beta, depth, nullMove) {
     pvLength[searchOne] = searchOne;
 
@@ -3211,6 +3235,7 @@ var chessEngine = function (
   }
 
   // Search position for the best move
+  // @param depth - the depth of the search
   function searchPosition(depth) {
     let start = new Date().getTime();
     let score = 0;
@@ -3417,6 +3442,7 @@ var chessEngine = function (
   }
 
   // This function will load more move sequences
+  // @param moves - The moves to be loaded
   function loadMoves(moves) {
     moves = moves.split(" ");
 
@@ -3430,6 +3456,7 @@ var chessEngine = function (
   }
 
   // This function will make the move visible on the board GUI
+  // @param move - The move to be made
   function moveToString(move) {
     if (getMovePromoted(move)) {
       return (
