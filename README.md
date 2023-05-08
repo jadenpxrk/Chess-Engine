@@ -9,6 +9,14 @@
 
 A chess engine based on the Negamax algorithm with up to 10th depth game analysis. (if given enough time)
 
+## Built With
+#### Language(s)
+- JavaScript
+- HTML
+
+#### Libraries/Packages
+- (Bootstrap)[https://getbootstrap.com/]
+
 ## Features
 
 - Negamax algorithm with alpha-beta pruning
