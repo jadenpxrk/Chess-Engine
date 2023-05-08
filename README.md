@@ -17,7 +17,7 @@ A chess engine based on the Negamax algorithm with up to 10th depth game analysi
 - HTML
 
 #### Libraries/Packages
-- (Bootstrap)[https://getbootstrap.com/]
+- [Bootstrap](https://getbootstrap.com/)
 
 ---
 
