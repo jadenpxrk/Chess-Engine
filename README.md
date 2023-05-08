@@ -9,6 +9,8 @@
 
 A chess engine based on the Negamax algorithm with up to 10th depth game analysis. (if given enough time)
 
+---
+
 ## Built With
 #### Language(s)
 - JavaScript
@@ -16,6 +18,8 @@ A chess engine based on the Negamax algorithm with up to 10th depth game analysi
 
 #### Libraries/Packages
 - (Bootstrap)[https://getbootstrap.com/]
+
+---
 
 ## Features
 
