@@ -142,6 +142,7 @@ function resetGame() {
 // This function will undo the last move played whenever the user clicks on the take back button
 function undoMove() {
   engine.takeBack();
+  engine.takeBack();
   engine.drawBoard();
   engine.updateBoard();
 }
