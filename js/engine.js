@@ -3515,8 +3515,7 @@ var chessEngine = function (
 
     // This function will render the board in the browser
     function drawBoard() {
-      var chessBoard =
-        '<table align="center" style="border: 1px solid black" cellspacing="0">';
+      var chessBoard = '<table align="center" cellspacing="0">';
 
       // The board table
       for (var row = 0; row < 8; row++) {
