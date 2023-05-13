@@ -18,7 +18,7 @@ A chess engine based on the Negamax algorithm with up to 10th depth game analysi
 - Piece-square tables for evaluating the relative value of pieces on the board, guiding the search algorithm towards better moves.
 - Move ordering using the MVV-LVA heuristic for prioritizing moves that capture high-value pieces and reducing the search space.
 - Principal variation search for improving the efficiency of the search process by searching only the most promising lines of play.
-- Quiescence search for ensuring that the evaluation of the position is stable by extending the search to positions where there are no ---captures or checks.
+- Quiescence search for ensuring that the evaluation of the position is stable by extending the search to positions where there are no -- captures or checks.
 - Zobrist hashing for storing the game state in a compact and efficient way, allowing for quick comparisons and detection of repetitions.
 
 The GUI includes undoing moves, flipping and resetting the board, under promotions, and custom board positions and evaluation times.
