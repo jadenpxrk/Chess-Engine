@@ -7,18 +7,12 @@
 
 ## About
 
-A chess engine based on the Negamax algorithm with up to 10th depth game analysis. (if given enough time)
+A chess engine based on the Negamax algorithm with up to 10th depth game analysis. 
 
-## Technologies Used
-### Languages
-- JavaScript
-- HTML
+## Libraries and Tools Used
+- [Bootstrap](https://getbootstrap.com/) for GUI buttons. 
 
-### Libraries/Packages
-- [Bootstrap](https://getbootstrap.com/)
-
-## Features
-
+## Algorithms
 - Negamax algorithm with alpha-beta pruning
 - Iterative deepening
 - Piece-square tables
@@ -27,12 +21,16 @@ A chess engine based on the Negamax algorithm with up to 10th depth game analysi
 - Quiescence search
 - Zobrist hashing
 
-GUI includes undoing moves, flipping and resetting the board, under promotions, and custom board positions and evaluation times.
+The GUI includes undoing moves, flipping and resetting the board, under promotions, and custom board positions and evaluation times.
 
 ## Possible Improvements
-
 - Switching programming languages
 - Using a more detailed evaluation method (ex. use of opening tables)
 - Transposition Tables
 
+## License
+See [License](https://github.com/JaehyeongPark06/Chess-Engine/blob/main/LICENSE)
+
 #### You can play against it [here](https://jaehyeong-chess-engine.netlify.app/)
+
+
