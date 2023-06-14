@@ -7,7 +7,7 @@
  * @param nextSquareColor: The color of the next square when a move is made
  * @param previousSquareColor: The color of the previous square when a move is made
  * @return: A chess engine object
- **/
+ */
 var chessEngine = function (
   sizeOfBoard,
   lightSquare,
@@ -470,7 +470,7 @@ var chessEngine = function (
 
   /**
    * @brief resetBoard resets the chess board
-   **/
+   */
   function resetBoard() {
     // Restting the board position requires us to loops through each file and rank
     for (var rank = 0; rank < 8; rank++) {
@@ -499,7 +499,7 @@ var chessEngine = function (
 
   /**
    * @brief initializePieceList will initialize the piece list
-   **/
+   */
   function initializePieceList() {
     for (var piece = P; piece <= k; piece++) pieceList[piece] = 0;
 
@@ -521,7 +521,7 @@ var chessEngine = function (
   /**
    * @brief moveFromString will move a piece from a string
    * @param moveString is the move string
-   **/
+   */
   function moveFromString(moveString) {
     let moveList = [];
     generateMoves(moveList);
@@ -586,7 +586,7 @@ var chessEngine = function (
    * @brief isSquareAttacked checks if a square is being attacked
    * @param square is the square that is being checked
    * @param side is the side that is attacking
-   **/
+   */
   function isSquareAttacked(square, side) {
     // If it is being attacked by pawns
     for (let index = 0; index < 2; index++) {
@@ -631,7 +631,7 @@ var chessEngine = function (
    * @param pawn is the pawn that was moved (if)
    * @param enpassant is the enpassant square
    * @param castling is the castling rights
-   **/
+   */
   function encodeMove(
     source,
     target,
@@ -882,7 +882,7 @@ var chessEngine = function (
    * @brief addMove adds a move to the move list
    * @param moveList is the list the move is being added to
    * @param move is the move that is being added
-   **/
+   */
   function addMove(moveList, move) {
     let moveScore = 0;
 
@@ -907,7 +907,7 @@ var chessEngine = function (
   /**
    * @brief generateMoves generates moves for the AI
    * @param moveList is the list the moves are being added to
-   **/
+   */
   function generateMoves(moveList) {
     for (let piece = P; piece <= k; piece++) {
       for (let pieceIndex = 0; pieceIndex < pieceList[piece]; pieceIndex++) {
@@ -1150,7 +1150,7 @@ var chessEngine = function (
   /**
    * @brief generateCaptures will be generating captures for the AI
    * @param moveList is the list of moves
-   **/
+   */
   function generateCaptures(moveList) {
     for (let piece = P; piece <= k; piece++) {
       for (let pieceIndex = 0; pieceIndex < pieceList[piece]; pieceIndex++) {
@@ -1275,7 +1275,7 @@ var chessEngine = function (
   /**
    * @brief generateLegalMoves will be generating legal moves for the AI
    * @return legalMoves is the list of legal moves
-   **/
+   */
   function generateLegalMoves() {
     let legalMoves = [];
     let moveList = [];
@@ -1297,7 +1297,7 @@ var chessEngine = function (
    * @param piece is the piece to be moved
    * @param previousSquare is the previous square of the piece
    * @param nextSquare is the next square of the piece
-   **/
+   */
   function moveCurrentPiece(piece, previousSquare, nextSquare) {
     board[nextSquare] = board[previousSquare];
     board[previousSquare] = e;
@@ -1316,7 +1316,7 @@ var chessEngine = function (
    * @brief removePiece will be taking back the move
    * @param piece is the piece to be removed
    * @param square is the square of the piece
-   **/
+   */
   function removePiece(piece, square) {
     for (let pieceIndex = 0; pieceIndex < pieceList[piece]; pieceIndex++) {
       if (pieceList.pieces[piece * 10 + pieceIndex] == square) {
@@ -1334,7 +1334,7 @@ var chessEngine = function (
    * @brief addPiece will be adding the piece
    * @param piece is the piece to be added
    * @param square is the square of the piece
-   **/
+   */
   function addPiece(piece, square) {
     board[square] = piece;
     hashKey ^= pieceKeys[piece * 128 + square];
@@ -1346,7 +1346,7 @@ var chessEngine = function (
    * @brief makeMove will be making the move
    * @param move is the move to be made
    * @return 1 if the move is legal, 0 if the move is illegal
-   **/
+   */
   function makeMove(move) {
     // This updates the plies
     searchOne++;
@@ -1488,7 +1488,7 @@ var chessEngine = function (
 
   /**
    * @brief takeBack will be taking back the move
-   **/
+   */
   function takeBack() {
     // This updates our plies
     searchOne--;
@@ -1565,7 +1565,7 @@ var chessEngine = function (
 
   /**
    * @brief makeNullMove will make a null move
-   **/
+   */
   function makeNullMove() {
     // This is backing up the current board state
     movesStack.push({
@@ -1587,7 +1587,7 @@ var chessEngine = function (
 
   /**
    * @brief takeNullMove will take back a null move
-   **/
+   */
   function takeNullMove() {
     // Restoring the board state
     side = movesStack[movesStack.length - 1].side;
@@ -2658,9 +2658,9 @@ var chessEngine = function (
   ];
 
   /**
-   *  isMaterialDraw will check if the game is a draw due to insufficient material
+   * @brief isMaterialDraw will check if the game is a draw due to insufficient material
    * @return {boolean} true if the game is a draw due to insufficient material, false otherwise
-   **/
+   */
   function isMaterialDraw() {
     // We will first check if there are any pawns for both sides
     if (pieceList[P] == 0 && pieceList[p] == 0) {
@@ -2736,9 +2736,9 @@ var chessEngine = function (
   }
 
   /**
-   *  getGamePhase will return the phase of the game
+   * @brief getGamePhase will return the phase of the game
    * @return {number} 0 if the game is in the opening phase, 1 if the game is in the endgame phase
-   **/
+   */
   function getGamePhase() {
     // We want to return "endgame" if there are no queens on board
     if (pieceList[Q] == 0 || pieceList[q] == 0) return 1;
@@ -2760,7 +2760,7 @@ var chessEngine = function (
   /**
    * @brief evalue will evaluate the score of the game
    * @return {number} the score of the game
-   **/
+   */
   function evaluate() {
     // We will be calling the isMaterialDraw function to check if the game is a draw by insufficient material
     // If this function returns true, we return 0 or in other words tell the engine not to evaluate a move as the game is over
@@ -2874,15 +2874,15 @@ var chessEngine = function (
   };
 
   /**
-   *  setTimeControl is a function that will set the time control
-   **/
+   * @brief setTimeControl is a function that will set the time control
+   */
   function setTimeControl(timeControl) {
     timing = timeControl;
   }
 
   /**
-   *  resetTimeControl is a function that will reset the time control
-   **/
+   * @brief resetTimeControl is a function that will reset the time control
+   */
   function resetTimeControl() {
     timing = {
       timeSet: 0,
@@ -2893,8 +2893,8 @@ var chessEngine = function (
   }
 
   /**
-   *  clearSearch is a function that will clear the search
-   **/
+   * @brief clearSearch is a function that will clear the search
+   */
   function clearSearch() {
     // Resetting the nodes counter back to 0
     nodes = 0;
@@ -2912,16 +2912,16 @@ var chessEngine = function (
   }
 
   /**
-   *  checkTime is a function that will check how long the search has been running for
-   **/
+   * @brief checkTime is a function that will check how long the search has been running for
+   */
   function checkTime() {
     if (timing.timeSet == 1 && new Date().getTime() > timing.stopTime)
       timing.stopped = 1;
   }
 
   /**
-   *  isRepition is a function that will check if the current position is a repetition
-   **/
+   * @brief isRepition is a function that will check if the current position is a repetition
+   */
   function isRepetition() {
     for (let index = 0; index < gameOne; index++)
       // Checking if the repetition table is equal to the current hash key
@@ -2933,7 +2933,7 @@ var chessEngine = function (
    * @brief sortMoves is a function that will sort the moves
    * @param currentCount is the current move count
    * @param moveList is the list of moves
-   **/
+   */
   function sortMoves(currentCount, moveList) {
     for (
       let nextCount = currentCount + 1;
@@ -2954,7 +2954,7 @@ var chessEngine = function (
   /**
    * @brief sortPVMoves is a function that will sort the PV (principal variation) moves
    * @param moveList is the list of moves
-   **/
+   */
   function sortPVMoves(moveList) {
     if (followPV) {
       followPV = 0;
@@ -2973,9 +2973,9 @@ var chessEngine = function (
   }
 
   /**
-   *  storePVMoves will be responsible for storing the PV moves
+   * @brief storePVMoves will be responsible for storing the PV moves
    * @param move is the move to be stored
-   **/
+   */
   function storePVMoves(move) {
     pvTable[searchOne * 64 + searchOne] = move;
     for (
@@ -2993,7 +2993,7 @@ var chessEngine = function (
    * @param alpha is the alpha value
    * @param beta is the beta value
    * @return the alpha value
-   **/
+   */
   function Queiscence(alpha, beta) {
     pvLength[searchOne] = searchOne;
     // Increment the nodes searched by one
@@ -3064,7 +3064,7 @@ var chessEngine = function (
    * @param nullMove is the null move
    * @return the alpha value if the score is less than or equal to the alpha value
    * @return the beta value if the score is greater than or equal to the beta value
-   **/
+   */
   function Negamax(alpha, beta, depth, nullMove) {
     pvLength[searchOne] = searchOne;
 
@@ -3266,9 +3266,10 @@ var chessEngine = function (
     return alpha;
   }
 
-  /** @brief searchPosition
-   **/
-  // @param depth - the depth of the search
+  /**
+   * @brief searchPosition
+   * @param depth is the depth of the search
+   */
   function searchPosition(depth) {
     let lastBestMove = 0;
 
@@ -3333,7 +3334,7 @@ var chessEngine = function (
   /**
    * @brief setBoard sets the board position given the FEN string
    * @param fen is the FEN string
-   **/
+   */
   function setBoard(fen) {
     resetBoard();
     var index = 0;
@@ -3420,7 +3421,7 @@ var chessEngine = function (
   /**
    * @brief loadMoves loads the moves
    * @param moves is the string of moves
-   **/
+   */
   function loadMoves(moves) {
     moves = moves.split(" ");
 
@@ -3436,7 +3437,7 @@ var chessEngine = function (
   /**
    * @brief moveToString converts a move to a string
    * @param move is the move to convert
-   **/
+   */
   function moveToString(move) {
     if (getMovePromoted(move)) {
       return (
@@ -3539,7 +3540,7 @@ var chessEngine = function (
 
     /**
      * @brief updateBoard updates the board
-     **/
+     */
     function updateBoard() {
       for (var row = 0; row < 8; row++) {
         for (var col = 0; col < 16; col++) {
