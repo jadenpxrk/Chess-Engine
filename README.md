@@ -26,6 +26,7 @@ The GUI includes undoing moves, flipping and resetting the board, under promotio
 - Switching programming languages
 - Using a more detailed evaluation method (ex. use of opening tables)
 - Transposition Tables
+- Replacing [Simplified Evaluation](https://www.chessprogramming.org/Simplified_Evaluation_Function) with [PeSTO's Evaluation Function](https://www.chessprogramming.org/PeSTO%27s_Evaluation_Function)
 
 ## License
 See [License](https://github.com/JaehyeongPark06/Chess-Engine/blob/main/LICENSE)
