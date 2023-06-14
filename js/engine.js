@@ -1,4 +1,13 @@
-// Initializing the chess engine
+/**
+ * @brief chessEngine is the engine for the chess game
+ * @param sizeOfBoard: The size of the board in pixels
+ * @param lightSquare: The color of the light squares
+ * @param darkSquare: The color of the dark squares
+ * @param selectionColor: The color of the selected square
+ * @param nextSquareColor: The color of the next square when a move is made
+ * @param previousSquareColor: The color of the previous square when a move is made
+ * @return: A chess engine object
+ **/
 var chessEngine = function (
   sizeOfBoard,
   lightSquare,
@@ -7,13 +16,11 @@ var chessEngine = function (
   nextSquareColor,
   previousSquareColor
 ) {
-  // These will be our global constants for the chess engine
-
-  // Sides in a chess game
+  // CONSTANTS
   const white = 0;
   const black = 1;
 
-  // The piece encoding
+  // PIECE ENCODING
   const P = 1,
     N = 2,
     B = 3,
@@ -28,11 +35,9 @@ var chessEngine = function (
     q = 11,
     k = 12;
 
-  // Empty squares and squares off the board
   const e = 0,
     o = 13;
 
-  // The square encoding going by row
   const a8 = 0,
     b8 = 1,
     c8 = 2,
@@ -105,10 +110,9 @@ var chessEngine = function (
     g1 = 118,
     h1 = 119;
 
-  // Off the board empessant squares
   const noEnpassant = 120;
 
-  // This is an array to convert board square indices to coordinates
+  // PIECE ARRAYS
   const coordinates = [
     "a8",
     "b8",
@@ -240,12 +244,10 @@ var chessEngine = function (
     "p1",
   ];
 
-  // The following variables will be for the chess board
-
-  // The FEN (Forsyth-Edwards Notation) of the starting board
+  // The FEN of the starting position
   const startFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 ";
 
-  // This is our chess board represented by a 1D array where e's represent empty squares and o's represent squares off the board as mentioned earlier
+  // Chess board represented by a 1D array where
   var board = [
     r,
     n,
@@ -412,9 +414,7 @@ var chessEngine = function (
   var searchOne = 0;
   var gameOne = 0;
 
-  // A RNG
-
-  // This is a fixed random seed
+  // Fixed random seed
   var randomState = 1804289383;
 
   // This function is generating random 32-bit pseudo legal numbers
@@ -430,20 +430,25 @@ var chessEngine = function (
     return number;
   }
 
-  // Zoborist hashing
-  // Initializing random keys
+  // ZOBRIST HASHING
+  // Initializing random keys for the hash board
   var pieceKeys = new Array(13 * 128);
   var castleKeys = new Array(16);
   var sideKey;
 
-  // Initializing random hash keys
+  /**
+   * @brief initRandomKeys initializes the random keys for the hash board
+   */
   function initRandomKeys() {
     for (var index = 0; index < 13 * 128; index++) pieceKeys[index] = random();
     for (var index = 0; index < 16; index++) castleKeys[index] = random();
     sideKey = random();
   }
 
-  // This function generates a hash key
+  /**
+   * @brief generateHashKey generates the hash key for the hash board
+   * @return The hash key for the hash board
+   */
   function generateHashKey() {
     var finalKey = 0;
 
@@ -463,9 +468,9 @@ var chessEngine = function (
     return finalKey;
   }
 
-  // Functions for the chess board
-
-  // This function resets the board when called
+  /**
+   * @brief resetBoard resets the chess board
+   **/
   function resetBoard() {
     // Restting the board position requires us to loops through each file and rank
     for (var rank = 0; rank < 8; rank++) {
@@ -492,16 +497,15 @@ var chessEngine = function (
     for (let index in repetitionTable) repetitionTable[index] = 0;
   }
 
-  // The function is initializing the piece list
+  /**
+   * @brief initializePieceList will initialize the piece list
+   **/
   function initializePieceList() {
-    // This resets the piece counts
     for (var piece = P; piece <= k; piece++) pieceList[piece] = 0;
 
-    // This resets the piece list
     for (var index = 0; index < pieceList.pieces.length; index++)
       pieceList.pieces[index] = 0;
 
-    // This associate pieces with squares and count material
     for (var square = 0; square < 128; square++) {
       if ((square & 0x88) == 0) {
         var piece = board[square];
@@ -514,8 +518,10 @@ var chessEngine = function (
     }
   }
 
-  // This function is validating the moves
-  // @param moveString - The move string
+  /**
+   * @brief moveFromString will move a piece from a string
+   * @param moveString is the move string
+   **/
   function moveFromString(moveString) {
     let moveList = [];
     generateMoves(moveList);
@@ -570,20 +576,17 @@ var chessEngine = function (
           continue;
         }
 
-        // Then we return the legal move
         return move;
       }
     }
-
-    // In the case that it's illegal, we return 0
     return 0;
   }
 
-  // The following will check for potential attacks
-
-  // This function will check if a square is being attacked and what it is being attacked by
-  // @param square - The square to check
-  // @param side - The side to check
+  /**
+   * @brief isSquareAttacked checks if a square is being attacked
+   * @param square is the square that is being checked
+   * @param side is the side that is attacking
+   **/
   function isSquareAttacked(square, side) {
     // If it is being attacked by pawns
     for (let index = 0; index < 2; index++) {
@@ -595,7 +598,6 @@ var chessEngine = function (
         return 1;
     }
 
-    // If it is being attacked by jumping pieces
     for (let piece in jumpingPieces) {
       for (let index = 0; index < 8; index++) {
         let nextSquare = square + jumpingPieces[piece].offsets[index];
@@ -605,7 +607,6 @@ var chessEngine = function (
       }
     }
 
-    // If it is being attaced by sniper pieces
     for (let piece in sniperPieces) {
       for (let index = 0; index < 4; index++) {
         let nextSquare = square + sniperPieces[piece].offsets[index];
@@ -621,16 +622,16 @@ var chessEngine = function (
     return 0;
   }
 
-  // The following will be for move encoding
-
-  // This function will encode a move
-  // @param source - The source square
-  // @param target - The target square
-  // @param piece - The piece moved
-  // @param capture - The piece that was captured
-  // @param pawn - pawn promotion
-  // @param enpassant - enpassant rights
-  // @param castling - castling rights
+  /**
+   * @brief encodeMove will encode the move
+   * @param source is the square the piece is moving from
+   * @param target is the square the piece is moving to
+   * @param piece is the piece that was moved
+   * @param capture is the piece that was captured
+   * @param pawn is the pawn that was moved (if)
+   * @param enpassant is the enpassant square
+   * @param castling is the castling rights
+   **/
   function encodeMove(
     source,
     target,
@@ -640,7 +641,6 @@ var chessEngine = function (
     enpassant,
     castling
   ) {
-    // It will take 7 parameters
     return (
       source |
       (target << 7) |
@@ -652,7 +652,6 @@ var chessEngine = function (
     );
   }
 
-  // The following functions will decode the move
   function getMoveSource(move) {
     return move & 0x7f;
   }
@@ -675,15 +674,11 @@ var chessEngine = function (
     return (move >> 21) & 0x1;
   }
 
-  // The following will be for move generation
-
-  // Stating piece's move offsets
   var knightOffsets = [33, 31, 18, 14, -33, -31, -18, -14];
   var bishopOffsets = [15, 17, -15, -17];
   var rookOffsets = [16, -16, 1, -1];
   var kingOffsets = [16, -16, 1, -1, 15, 17, -15, -17];
 
-  // The pawn directions to side mapping
   var pawnDirections = {
     offsets: [
       [17, 15],
@@ -692,13 +687,11 @@ var chessEngine = function (
     pawn: [P, p],
   };
 
-  // jumping piece to offset mapping
   var jumpingPieces = {
     knight: { offsets: knightOffsets, side: [N, n] },
     king: { offsets: kingOffsets, side: [K, k] },
   };
 
-  // sniper piece to offset mapping
   var sniperPieces = {
     bishop: {
       offsets: bishopOffsets,
@@ -754,7 +747,6 @@ var chessEngine = function (
     ],
   };
 
-  // This variable will be holding castling rights
   var castlingRights = [
     7,
     15,
@@ -886,9 +878,11 @@ var chessEngine = function (
     o,
   ];
 
-  // This function will be adding moves to a move list
-  // @param moveList - the list to add moves to
-  // @param move - the move to add
+  /**
+   * @brief addMove adds a move to the move list
+   * @param moveList is the list the move is being added to
+   * @param move is the move that is being added
+   **/
   function addMove(moveList, move) {
     let moveScore = 0;
 
@@ -910,19 +904,17 @@ var chessEngine = function (
     });
   }
 
-  // This function will be generating moves for the AI's sides
-  // @param moveList - the list to add moves to
+  /**
+   * @brief generateMoves generates moves for the AI
+   * @param moveList is the list the moves are being added to
+   **/
   function generateMoves(moveList) {
     for (let piece = P; piece <= k; piece++) {
       for (let pieceIndex = 0; pieceIndex < pieceList[piece]; pieceIndex++) {
         let previousSquare = pieceList.pieces[piece * 10 + pieceIndex];
 
-        // This will be for pawns
         if (board[previousSquare] == specialMoves.side[side].pawn) {
           let nextSquare = previousSquare + specialMoves.side[side].target;
-
-          // This will be for quiet moves
-          // ==> Quiet moves are moves taht don't capture any pieces
           if ((nextSquare & 0x88) == 0 && board[nextSquare] == e) {
             if (
               previousSquare >= specialMoves.side[side].rank7[0] &&
@@ -964,7 +956,6 @@ var chessEngine = function (
             }
           }
 
-          // This will be for moves that capture pieces
           for (let index = 0; index < 2; index++) {
             let pawn_offset = specialMoves.side[side].offset[index];
             let nextSquare = previousSquare + pawn_offset;
@@ -1113,7 +1104,6 @@ var chessEngine = function (
           }
         }
 
-        // This will be for sniper pieces such as the Rook and Bishop
         for (let piece in sniperPieces) {
           if (
             board[previousSquare] == sniperPieces[piece].side[side][0] ||
@@ -1157,8 +1147,10 @@ var chessEngine = function (
     }
   }
 
-  // This function will be generating captures for the AI
-  // @param moveList - The list of moves
+  /**
+   * @brief generateCaptures will be generating captures for the AI
+   * @param moveList is the list of moves
+   **/
   function generateCaptures(moveList) {
     for (let piece = P; piece <= k; piece++) {
       for (let pieceIndex = 0; pieceIndex < pieceList[piece]; pieceIndex++) {
@@ -1216,8 +1208,6 @@ var chessEngine = function (
             }
           }
         }
-
-        // If the piece is a jumping piece like the king or knight
         for (let piece in jumpingPieces) {
           if (board[previousSquare] == jumpingPieces[piece].side[side]) {
             for (let index = 0; index < 8; index++) {
@@ -1244,7 +1234,6 @@ var chessEngine = function (
           }
         }
 
-        // This will be for sniper pieces like the rook and bishop
         for (let piece in sniperPieces) {
           if (
             board[previousSquare] == sniperPieces[piece].side[side][0] ||
@@ -1283,7 +1272,10 @@ var chessEngine = function (
     }
   }
 
-  // This function will be generating legal moves for the AI
+  /**
+   * @brief generateLegalMoves will be generating legal moves for the AI
+   * @return legalMoves is the list of legal moves
+   **/
   function generateLegalMoves() {
     let legalMoves = [];
     let moveList = [];
@@ -1300,7 +1292,12 @@ var chessEngine = function (
     return legalMoves;
   }
 
-  // This function will move the current piece from the intial square to the square it wants to go to (nextSquare)
+  /**
+   * @brief moveCurrentPiece will be moving the current piece
+   * @param piece is the piece to be moved
+   * @param previousSquare is the previous square of the piece
+   * @param nextSquare is the next square of the piece
+   **/
   function moveCurrentPiece(piece, previousSquare, nextSquare) {
     board[nextSquare] = board[previousSquare];
     board[previousSquare] = e;
@@ -1315,7 +1312,11 @@ var chessEngine = function (
     }
   }
 
-  // This function will remove a piece from the board
+  /**
+   * @brief removePiece will be taking back the move
+   * @param piece is the piece to be removed
+   * @param square is the square of the piece
+   **/
   function removePiece(piece, square) {
     for (let pieceIndex = 0; pieceIndex < pieceList[piece]; pieceIndex++) {
       if (pieceList.pieces[piece * 10 + pieceIndex] == square) {
@@ -1329,7 +1330,11 @@ var chessEngine = function (
       pieceList.pieces[piece * 10 + pieceList[piece]];
   }
 
-  // This function will add pieces to the board
+  /**
+   * @brief addPiece will be adding the piece
+   * @param piece is the piece to be added
+   * @param square is the square of the piece
+   **/
   function addPiece(piece, square) {
     board[square] = piece;
     hashKey ^= pieceKeys[piece * 128 + square];
@@ -1337,7 +1342,11 @@ var chessEngine = function (
     pieceList[piece]++;
   }
 
-  // This function makes the move
+  /**
+   * @brief makeMove will be making the move
+   * @param move is the move to be made
+   * @return 1 if the move is legal, 0 if the move is illegal
+   **/
   function makeMove(move) {
     // This updates the plies
     searchOne++;
@@ -1466,7 +1475,6 @@ var chessEngine = function (
     side ^= 1;
     hashKey ^= sideKey;
 
-    // This will return an illegal move if king is left in check
     if (
       isSquareAttacked(
         side == white ? kingSquare[side ^ 1] : kingSquare[side ^ 1],
@@ -1478,7 +1486,9 @@ var chessEngine = function (
     } else return 1;
   }
 
-  // This will be the function for taking back moves
+  /**
+   * @brief takeBack will be taking back the move
+   **/
   function takeBack() {
     // This updates our plies
     searchOne--;
@@ -1553,7 +1563,9 @@ var chessEngine = function (
     movesStack.pop();
   }
 
-  // This function will make a null move
+  /**
+   * @brief makeNullMove will make a null move
+   **/
   function makeNullMove() {
     // This is backing up the current board state
     movesStack.push({
@@ -1573,7 +1585,9 @@ var chessEngine = function (
     hashKey ^= sideKey;
   }
 
-  // This function will make a null move
+  /**
+   * @brief takeNullMove will take back a null move
+   **/
   function takeNullMove() {
     // Restoring the board state
     side = movesStack[movesStack.length - 1].side;
@@ -1584,9 +1598,7 @@ var chessEngine = function (
     movesStack.pop();
   }
 
-  /*
-    Simplified Evaluation Material Weights and Points
-  */
+  // Simplified Evaluation Material Weights and Points
 
   const materialWeights = [
     0, 100, 320, 330, 500, 900, 20000, -100, -320, -330, -500, -900, -20000,
@@ -2645,7 +2657,10 @@ var chessEngine = function (
     o,
   ];
 
-  // This function will check if there is enough material for a game to end in a checkmate or stalemate
+  /**
+   *  isMaterialDraw will check if the game is a draw due to insufficient material
+   * @return {boolean} true if the game is a draw due to insufficient material, false otherwise
+   **/
   function isMaterialDraw() {
     // We will first check if there are any pawns for both sides
     if (pieceList[P] == 0 && pieceList[p] == 0) {
@@ -2720,7 +2735,10 @@ var chessEngine = function (
     return 0;
   }
 
-  // This function will be responsible for getting the phase of the game such as the opening or endgame
+  /**
+   *  getGamePhase will return the phase of the game
+   * @return {number} 0 if the game is in the opening phase, 1 if the game is in the endgame phase
+   **/
   function getGamePhase() {
     // We want to return "endgame" if there are no queens on board
     if (pieceList[Q] == 0 || pieceList[q] == 0) return 1;
@@ -2739,7 +2757,10 @@ var chessEngine = function (
     return phaseScore > 2460 ? 0 : 1;
   }
 
-  // This is the STATIC evaluation function for the engine ==> determining who's winning
+  /**
+   * @brief evalue will evaluate the score of the game
+   * @return {number} the score of the game
+   **/
   function evaluate() {
     // We will be calling the isMaterialDraw function to check if the game is a draw by insufficient material
     // If this function returns true, we return 0 or in other words tell the engine not to evaluate a move as the game is over
@@ -2807,8 +2828,7 @@ var chessEngine = function (
     return side == white ? score : -score;
   }
 
-  // The following will be resposible for our search
-  // Creating a Most Valuable Victim - Least Valuable Aggressor (MVV-LVA) table
+  // Most Valuable Victim - Least Valuable Aggressor (MVV-LVA) table
   const MVVLVA = [
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 105, 205, 305, 405, 505, 605, 105,
     205, 305, 405, 505, 605, 0, 104, 204, 304, 404, 504, 604, 104, 204, 304,
@@ -2825,7 +2845,7 @@ var chessEngine = function (
     500, 600,
   ];
 
-  // The search constants
+  // SEARCH CONSTANTS
   const maxPly = 64;
   const infinity = 50000;
   const mateValue = 49000;
@@ -2839,11 +2859,7 @@ var chessEngine = function (
   // The PV table (principal variation)
   var pvTable = new Array(maxPly * maxPly);
   var pvLength = new Array(maxPly);
-
-  // The Dead moves
   var deadMoves = new Array(2 * maxPly);
-
-  // The Polan moves
   var polanMoves = new Array(13 * 128);
 
   // The Repetition table
@@ -2857,12 +2873,16 @@ var chessEngine = function (
     time: -1,
   };
 
-  // This is a function that will control the evaluation time for the engine
+  /**
+   *  setTimeControl is a function that will set the time control
+   **/
   function setTimeControl(timeControl) {
     timing = timeControl;
   }
 
-  // This function is responsible for reseting the time control
+  /**
+   *  resetTimeControl is a function that will reset the time control
+   **/
   function resetTimeControl() {
     timing = {
       timeSet: 0,
@@ -2872,7 +2892,9 @@ var chessEngine = function (
     };
   }
 
-  // This function will clear the previous search
+  /**
+   *  clearSearch is a function that will clear the search
+   **/
   function clearSearch() {
     // Resetting the nodes counter back to 0
     nodes = 0;
@@ -2889,15 +2911,17 @@ var chessEngine = function (
       polanMoves[index] = 0;
   }
 
-  // This function will check the time that has passed since the AI first started searching
+  /**
+   *  checkTime is a function that will check how long the search has been running for
+   **/
   function checkTime() {
-    // Checking if the time that was set in the settings is equal to 1 and if the current time is greater than that of the time
-    // the engine needs to stop by
     if (timing.timeSet == 1 && new Date().getTime() > timing.stopTime)
       timing.stopped = 1;
   }
 
-  // This function will check if the position is being repeated throughout the game
+  /**
+   *  isRepition is a function that will check if the current position is a repetition
+   **/
   function isRepetition() {
     for (let index = 0; index < gameOne; index++)
       // Checking if the repetition table is equal to the current hash key
@@ -2905,9 +2929,11 @@ var chessEngine = function (
     return 0;
   }
 
-  // This function will control which the order in which moves will be made
-  // @param currentCount - The current move count
-  // @parma moveList - The list of moves
+  /**
+   * @brief sortMoves is a function that will sort the moves
+   * @param currentCount is the current move count
+   * @param moveList is the list of moves
+   **/
   function sortMoves(currentCount, moveList) {
     for (
       let nextCount = currentCount + 1;
@@ -2925,14 +2951,13 @@ var chessEngine = function (
     }
   }
 
-  // This is sorting the PV (principal variation) moves
-  // @parma moveList - The list of moves
+  /**
+   * @brief sortPVMoves is a function that will sort the PV (principal variation) moves
+   * @param moveList is the list of moves
+   **/
   function sortPVMoves(moveList) {
-    // Checking if followPV is equal to 1 or true
     if (followPV) {
-      // Resetting back to 0
       followPV = 0;
-      // Loop through the current length of the moves list
       for (let count = 0; count < moveList.length; count++) {
         // If the movelist at the current count is equal to the PV table at the current search depth
         if (moveList[count].move == pvTable[searchOne]) {
@@ -2947,25 +2972,28 @@ var chessEngine = function (
     }
   }
 
-  // This function will be responsible for storing the PV Moves
-  // @param move - The move to be stored
+  /**
+   *  storePVMoves will be responsible for storing the PV moves
+   * @param move is the move to be stored
+   **/
   function storePVMoves(move) {
-    // Setting the PV table at the current search depth to the move
     pvTable[searchOne * 64 + searchOne] = move;
     for (
       var nextOne = searchOne + 1;
       nextOne < pvLength[searchOne + 1];
       nextOne++
     )
-      // Setting the PV table at the current search depth to the next depth
       pvTable[searchOne * 64 + nextOne] =
         pvTable[(searchOne + 1) * 64 + nextOne];
     pvLength[searchOne] = pvLength[searchOne + 1];
   }
 
-  // This function will be responsible for the Queiscence search
-  // @param alpha - The alpha value
-  // @param beta - The beta value
+  /**
+   * @brief Queiscence is a function that will be responsible for the Queiscence search
+   * @param alpha is the alpha value
+   * @param beta is the beta value
+   * @return the alpha value
+   **/
   function Queiscence(alpha, beta) {
     pvLength[searchOne] = searchOne;
     // Increment the nodes searched by one
@@ -3028,11 +3056,15 @@ var chessEngine = function (
     return alpha;
   }
 
-  // This function will be our Negamax Search
-  // @param alpha - The alpha value
-  // @param beta - The beta value
-  // @param depth - The depth of the search
-  // @param nullMove - The null move
+  /**
+   * @brief Negamax is a function that will be responsible for the Negamax search
+   * @param alpha is the alpha value
+   * @param beta is the beta value
+   * @param depth is the depth of the search
+   * @param nullMove is the null move
+   * @return the alpha value if the score is less than or equal to the alpha value
+   * @return the beta value if the score is greater than or equal to the beta value
+   **/
   function Negamax(alpha, beta, depth, nullMove) {
     pvLength[searchOne] = searchOne;
 
@@ -3234,11 +3266,10 @@ var chessEngine = function (
     return alpha;
   }
 
-  // Search position for the best move
+  /** @brief searchPosition
+   **/
   // @param depth - the depth of the search
   function searchPosition(depth) {
-    let start = new Date().getTime();
-    let score = 0;
     let lastBestMove = 0;
 
     clearSearch();
@@ -3256,63 +3287,6 @@ var chessEngine = function (
       )
         break;
 
-      let info = "";
-
-      if (typeof document != "undefined") var guiScore = 0;
-
-      // GUI Code
-      if (score > -mateValue && score < -mateScore) {
-        info =
-          "info score mate " +
-          parseInt(-(score + mateValue) / 2 - 1) +
-          " depth " +
-          currentDepth +
-          " nodes " +
-          nodes +
-          " time " +
-          (new Date().getTime() - start) +
-          " pv ";
-
-        if (typeof document != "undefined")
-          guiScore =
-            "mate in " + Math.abs(parseInt(-(score + mateValue) / 2 - 1));
-
-        break;
-      } else if (score > mateScore && score < mateValue) {
-        info =
-          "info score mate " +
-          parseInt((mateValue - score) / 2 + 1) +
-          " depth " +
-          currentDepth +
-          " nodes " +
-          nodes +
-          " time " +
-          (new Date().getTime() - start) +
-          " pv ";
-
-        if (typeof document != "undefined")
-          guiScore =
-            "mate in " + Math.abs(parseInt((mateValue - score) / 2 + 1));
-
-        break;
-      } else {
-        info =
-          "info score cp " +
-          score +
-          " depth " +
-          currentDepth +
-          " nodes " +
-          nodes +
-          " time " +
-          (new Date().getTime() - start) +
-          " pv ";
-
-        if (typeof document != "undefined") guiScore = -score;
-      }
-
-      for (let count = 0; count < pvLength[0]; count++)
-        info += moveToString(pvTable[count]) + " ";
-
       if (typeof document != "undefined") {
         document.getElementById("depth").innerHTML = currentDepth;
       }
@@ -3322,7 +3296,6 @@ var chessEngine = function (
     return bestMove;
   }
 
-  // The following will handle the input and output from the GUI
   // Castling variables
   var KC = 1,
     QC = 2,
@@ -3357,7 +3330,10 @@ var chessEngine = function (
     k: k,
   };
 
-  // Setting the board position from FEN
+  /**
+   * @brief setBoard sets the board position given the FEN string
+   * @param fen is the FEN string
+   **/
   function setBoard(fen) {
     resetBoard();
     var index = 0;
@@ -3441,8 +3417,10 @@ var chessEngine = function (
     initializePieceList();
   }
 
-  // This function will load more move sequences
-  // @param moves - The moves to be loaded
+  /**
+   * @brief loadMoves loads the moves
+   * @param moves is the string of moves
+   **/
   function loadMoves(moves) {
     moves = moves.split(" ");
 
@@ -3455,8 +3433,10 @@ var chessEngine = function (
     searchOne = 0;
   }
 
-  // This function will make the move visible on the board GUI
-  // @param move - The move to be made
+  /**
+   * @brief moveToString converts a move to a string
+   * @param move is the move to convert
+   **/
   function moveToString(move) {
     if (getMovePromoted(move)) {
       return (
@@ -3471,7 +3451,7 @@ var chessEngine = function (
     }
   }
 
-  // The color theme for the GUI/board
+  // GUI VARIABLES
   if (typeof document != "undefined") {
     // Color theme
     var LIGHT_SQUARE = "#E9EBEE";
@@ -3505,15 +3485,15 @@ var chessEngine = function (
       PREV_COLOR = previousSquareColor;
     }
 
-    // Flip board
     var flip = 0;
 
-    // Flip board
     function flipBoard() {
       flip ^= 1;
     }
 
-    // This function will render the board in the browser
+    /**
+     * @brief drawBoard draws the board in the HTML page
+     */
     function drawBoard() {
       var chessBoard = '<table align="center" cellspacing="0">';
 
@@ -3557,7 +3537,9 @@ var chessEngine = function (
       document.getElementById("chessboard").innerHTML = chessBoard;
     }
 
-    // Drawing pieces
+    /**
+     * @brief updateBoard updates the board
+     **/
     function updateBoard() {
       for (var row = 0; row < 8; row++) {
         for (var col = 0; col < 16; col++) {
@@ -3574,7 +3556,12 @@ var chessEngine = function (
       }
     }
 
-    // This function will control how pieces move
+    /**
+     * @brief movePiece moves a piece from the source to the target square
+     * @param userSource is the source square
+     * @param userTarget is the target square
+     * @param promotedPiece is the piece being promoted
+     */
     function movePiece(userSource, userTarget, promotedPiece) {
       let moveString =
         coordinates[userSource] +
@@ -3591,7 +3578,6 @@ var chessEngine = function (
     updateBoard();
   }
 
-  // Initializing the engine
   (function initAll() {
     initRandomKeys();
     hashKey = generateHashKey();
@@ -3695,7 +3681,7 @@ var chessEngine = function (
       H1: h1,
     },
 
-    // GUI functions
+    // GUI FUNCTIONS
     drawBoard: function () {
       try {
         return drawBoard();
@@ -3725,7 +3711,7 @@ var chessEngine = function (
       }
     },
 
-    // The board methods
+    // BOARD METHODS
     squareToString: function (square) {
       return coordinates[square];
     },
@@ -3748,7 +3734,7 @@ var chessEngine = function (
       return fifty;
     },
 
-    // Move manipulation
+    // MOVE MANIPULATIION
     moveFromString: function (moveString) {
       return moveFromString(moveString);
     },
@@ -3771,7 +3757,7 @@ var chessEngine = function (
       return generateLegalMoves();
     },
 
-    // Time Functions
+    // TIME FUNCTIONS
     resetTimeControl: function () {
       resetTimeControl();
     },
@@ -3785,7 +3771,7 @@ var chessEngine = function (
       return searchPosition(depth);
     },
 
-    // Special Functions
+    // MISC. FUNCTIONS
     isMaterialDraw: function () {
       return isMaterialDraw();
     },

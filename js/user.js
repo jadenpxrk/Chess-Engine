@@ -9,19 +9,31 @@ var userSource, userTarget;
 // This will be a counter variable checking the amount of times a move is repeated
 var repetitions = 0;
 
-// This function is checking whether the user is dragging a piece
+/**
+ * @brief dragPiece will set the source square to the square that the user is dragging
+ * @param {*} event is the event that is being dragged
+ * @param {*} square is a square on the board
+ */
 function dragPiece(event, square) {
   userSource = square;
 }
 
-// This function is the drag piece handler
+/**
+ * @brief dragOver will check whether the user is dragging a piece over a square
+ * @param {*} event is the event that is being dragged
+ * @param {*} square is a square on the board
+ */
 function dragOver(event, square) {
   event.preventDefault();
   // If the user is dragging a piece, then the background color of the initial square will change
   if (square == userSource) event.target.src = "imgs/0.gif";
 }
 
-// This function is the drag piece handler
+/**
+ * @brief dropPiece will check where the user is dragging the piece to and move it to the target square if valid
+ * @param {*} event is the event that is being dragged
+ * @param {*} square is the square that the user is dragging the piece to
+ */
 function dropPiece(event, square) {
   userTarget = square;
 
@@ -54,7 +66,10 @@ function dropPiece(event, square) {
     }, 1);
 }
 
-// This function is the click event handler
+/**
+ * @brief tapPiece will check whether the user is tapping/clicking on a piece and move it to the target square
+ * @param {*} square is a square on the board that is being tapped/clicked
+ */
 function tapPiece(square) {
   engine.drawBoard();
   engine.updateBoard();
@@ -112,7 +127,13 @@ function tapPiece(square) {
   }
 }
 
-// This function will be checking the validity of the move
+/**
+ * @brief validateMove will check whether the move is valid
+ * @param {*} userSource is the source square
+ * @param {*} userTarget is the target square
+ * @param {*} promotedPiece is the piece that is being promoted
+ * @returns the move
+ */
 function validateMove(userSource, userTarget, promotedPiece) {
   let moveString =
     engine.squareToString(userSource) +
@@ -123,7 +144,9 @@ function validateMove(userSource, userTarget, promotedPiece) {
   return move;
 }
 
-// This function is setting the inputted FEN (Forsyth-Edwards Notation) onto the board
+/**
+ * @brief setFen will set the board to the fen that the user inputted
+ */
 function setFen() {
   let fen = document.getElementById("fen").value;
   engine.setBoard(fen);
@@ -131,7 +154,9 @@ function setFen() {
   engine.updateBoard();
 }
 
-// This function resets the board whenever the user clicks on the reset button
+/**
+ * @brief resetGame will reset the game to the starting position
+ */
 function resetGame() {
   engine.setBoard(engine.START_FEN);
   engine.drawBoard();
@@ -139,7 +164,9 @@ function resetGame() {
   repetitions = 0;
 }
 
-// This function will undo the last move played whenever the user clicks on the take back button
+/**
+ * @brief undoMove will undo the last move
+ */
 function undoMove() {
   engine.takeBack();
   engine.takeBack();
@@ -147,15 +174,18 @@ function undoMove() {
   engine.updateBoard();
 }
 
-// This function will flip the board whenever the user clicks on the flip board button
+/**
+ * @brief flip will flip the GUI board
+ */
 function flip() {
   engine.flipBoard();
   engine.drawBoard();
   engine.updateBoard();
 }
 
-// This function will make the AI think and play a move whenever the user clicks
-// on the AI Move button
+/**
+ * @brief think will make a move for the AI
+ */
 function think() {
   engine.drawBoard();
   engine.updateBoard();
