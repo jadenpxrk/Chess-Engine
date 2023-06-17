@@ -7,70 +7,85 @@
     <link rel="icon" href="imgs/favicon.ico" />
   </head>
   <body
-    style="font-size: 16px; position: flex; padding: 2rem 0 2rem"
+    style="
+      font-size: 16px;
+      position: flex;
+      padding: 2rem 0 2rem;
+      background-color: #222527;
+      color: #bfc3c2;
+    "
     class="text-center"
   >
-    <container>
-      <h4 style="font-weight: 500">Chess Engine</h4>
-      <div class="input-group mx-auto mt-2 mb-2" style="width: 600px">
-        <input id="fen" type="text" class="form-control rounded me-2" />
-        <div class="input-group-append">
-          <button onclick="setFen();" class="btn btn-outline-success">
-            Set FEN
-          </button>
-        </div>
+    <h4 style="font-weight: 700; margin-bottom: 1rem; font-size: 35px">
+      Chess Engine
+    </h4>
+    <div class="input-group mx-auto mt-2 mb-2" style="width: 600px">
+      <input id="fen" type="text" class="form-control rounded me-2" />
+      <div class="input-group-append">
+        <button onclick="setFen();" class="btn btn-success">Set FEN</button>
       </div>
-      <div id="chessboard"></div>
-      <div class="btn-group mt-2" style="width: 600px">
-        <button
-          class="btn btn-outline-danger rounded me-2"
-          onclick="resetGame();"
-        >
-          Reset
-        </button>
-        <button class="btn btn-outline-primary rounded me-2" onclick="flip()">
-          Flip Board
-        </button>
-        <button class="btn btn-outline-primary rounded me-2" onclick="think();">
-          AI Move
-        </button>
-        <button
-          class="btn btn-outline-primary rounded me-2"
-          onclick="undoMove();"
-        >
-          Take Back
-        </button>
-        <select
-          id="movetime"
-          class="btn btn-outline-secondary col-2 rounded me-2 text-center"
-          style="appearance: none"
-        >
-          <option value="1">1 sec</option>
-          <option value="3">3 sec</option>
-          <option value="5">5 sec</option>
-          <option value="10">10 sec</option>
-        </select>
-        <select
-          id="promoted"
-          class="btn btn-outline-secondary rounded col-2 text-center"
-          style="appearance: none"
-        >
-          <option value="5">Queen</option>
-          <option value="4">Rook</option>
-          <option value="3">Bishop</option>
-          <option value="2">Knight</option>
-        </select>
-      </div>
+    </div>
+    <div id="chessboard"></div>
+    <div class="btn-group mt-2" style="width: 600px">
+      <button class="btn btn-danger rounded me-3" onclick="resetGame();">
+        Reset
+      </button>
+      <button class="btn btn-primary rounded me-3" onclick="flip()">
+        Flip
+      </button>
+      <button class="btn btn-primary rounded me-3" onclick="think();">
+        AI Move
+      </button>
+      <button class="btn btn-primary rounded" onclick="undoMove();">
+        Undo
+      </button>
+    </div>
+    <div
+      class="row mx-auto mt-2"
+      style="
+        position: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 1rem auto 0 auto;
+        width: 600px;
+      "
+    >
+      <label style="padding: 8px; font-size: 18px; font-weight: 500"
+        >Thinking Time:
+      </label>
+      <select id="movetime" style="padding: 4px; cursor: pointer">
+        <option value="1">1 sec</option>
+        <option value="3">3 sec</option>
+        <option value="5">5 sec</option>
+        <option value="10">10 sec</option>
+      </select>
+      <label style="padding: 8px; font-size: 18px; font-weight: 500"
+        >Promotion Type:
+      </label>
+      <select id="promoted" style="padding: 4px; cursor: pointer">
+        <option value="5">Queen</option>
+        <option value="4">Rook</option>
+        <option value="3">Bishop</option>
+        <option value="2">Knight</option>
+      </select>
+    </div>
 
-      <!-- Info -->
-      <div class="row mx-auto mt-2" style="width: 560px">
-        <div class="col text-center">
-          Search Depth:
-          <span id="depth" class="font-weight-bold ml-2">~</span>
-        </div>
+    <!-- Info -->
+    <div
+      class="row mx-auto mt-4"
+      style="
+        width: 600px;
+        position: flex;
+        justify-content: center;
+        align-items: center;
+      "
+    >
+      <div style="font-size: 20px; font-weight: 500" class="col text-center">
+        Depth:
+        <span id="depth" class="font-weight-bold ml-2">~</span>
       </div>
-    </container>
+    </div>
   </body>
   <script src="js/engine.js"></script>
-  <script src="js/user.js"></script>
+  <script src="js/game.js"></script>
 </html>

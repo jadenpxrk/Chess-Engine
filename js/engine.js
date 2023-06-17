@@ -1,12 +1,12 @@
 /**
  * @brief chessEngine is the engine for the chess game
- * @param sizeOfBoard: The size of the board in pixels
- * @param lightSquare: The color of the light squares
- * @param darkSquare: The color of the dark squares
- * @param selectionColor: The color of the selected square
- * @param nextSquareColor: The color of the next square when a move is made
- * @param previousSquareColor: The color of the previous square when a move is made
- * @return: A chess engine object
+ * @param {*} sizeOfBoard is the size of the board in pixels
+ * @param {*} lightSquare is the color of the light squares
+ * @param {*} darkSquare is the color of the dark squares
+ * @param {*} selectionColor is the color of the selected square
+ * @param {*} nextSquareColor is the color of the next square when a move is made
+ * @param {*} previousSquareColor is the color of the previous square when a move is made
+ * @return {object} A chess engine object
  */
 var chessEngine = function (
   sizeOfBoard,
@@ -415,7 +415,7 @@ var chessEngine = function (
   var gameOne = 0;
 
   // Fixed random seed
-  var randomState = 1804289383;
+  var randomState = 2304203948;
 
   // This function is generating random 32-bit pseudo legal numbers
   function random() {
@@ -447,7 +447,7 @@ var chessEngine = function (
 
   /**
    * @brief generateHashKey generates the hash key for the hash board
-   * @return The hash key for the hash board
+   * @return {number} The hash key for the hash board
    */
   function generateHashKey() {
     var finalKey = 0;
@@ -520,7 +520,7 @@ var chessEngine = function (
 
   /**
    * @brief moveFromString will move a piece from a string
-   * @param moveString is the move string
+   * @param {*} moveString is the move string
    */
   function moveFromString(moveString) {
     let moveList = [];
@@ -584,8 +584,8 @@ var chessEngine = function (
 
   /**
    * @brief isSquareAttacked checks if a square is being attacked
-   * @param square is the square that is being checked
-   * @param side is the side that is attacking
+   * @param {*} square is the square that is being checked
+   * @param {*} side is the side that is attacking
    */
   function isSquareAttacked(square, side) {
     // If it is being attacked by pawns
@@ -624,13 +624,13 @@ var chessEngine = function (
 
   /**
    * @brief encodeMove will encode the move
-   * @param source is the square the piece is moving from
-   * @param target is the square the piece is moving to
-   * @param piece is the piece that was moved
-   * @param capture is the piece that was captured
-   * @param pawn is the pawn that was moved (if)
-   * @param enpassant is the enpassant square
-   * @param castling is the castling rights
+   * @param {*} source is the square the piece is moving from
+   * @param {*} target is the square the piece is moving to
+   * @param {*} piece is the piece that was moved
+   * @param {*} capture is the piece that was captured
+   * @param {*} pawn is the pawn that was moved (if)
+   * @param {*} enpassant is the enpassant square
+   * @param {*} castling is the castling rights
    */
   function encodeMove(
     source,
@@ -880,8 +880,8 @@ var chessEngine = function (
 
   /**
    * @brief addMove adds a move to the move list
-   * @param moveList is the list the move is being added to
-   * @param move is the move that is being added
+   * @param {*} moveList is the list the move is being added to
+   * @param {*} move is the move that is being added
    */
   function addMove(moveList, move) {
     let moveScore = 0;
@@ -906,7 +906,7 @@ var chessEngine = function (
 
   /**
    * @brief generateMoves generates moves for the AI
-   * @param moveList is the list the moves are being added to
+   * @param {*} moveList is the list the moves are being added to
    */
   function generateMoves(moveList) {
     for (let piece = P; piece <= k; piece++) {
@@ -1149,7 +1149,7 @@ var chessEngine = function (
 
   /**
    * @brief generateCaptures will be generating captures for the AI
-   * @param moveList is the list of moves
+   * @param {*} moveList is the list of moves
    */
   function generateCaptures(moveList) {
     for (let piece = P; piece <= k; piece++) {
@@ -1274,7 +1274,7 @@ var chessEngine = function (
 
   /**
    * @brief generateLegalMoves will be generating legal moves for the AI
-   * @return legalMoves is the list of legal moves
+   * @return {Array} legalMoves is the list of legal moves
    */
   function generateLegalMoves() {
     let legalMoves = [];
@@ -1294,9 +1294,9 @@ var chessEngine = function (
 
   /**
    * @brief moveCurrentPiece will be moving the current piece
-   * @param piece is the piece to be moved
-   * @param previousSquare is the previous square of the piece
-   * @param nextSquare is the next square of the piece
+   * @param {*} piece is the piece to be moved
+   * @param {*} previousSquare is the previous square of the piece
+   * @param {*} nextSquare is the next square of the piece
    */
   function moveCurrentPiece(piece, previousSquare, nextSquare) {
     board[nextSquare] = board[previousSquare];
@@ -1314,8 +1314,8 @@ var chessEngine = function (
 
   /**
    * @brief removePiece will be taking back the move
-   * @param piece is the piece to be removed
-   * @param square is the square of the piece
+   * @param {*} piece is the piece to be removed
+   * @param {*} square is the square of the piece
    */
   function removePiece(piece, square) {
     for (let pieceIndex = 0; pieceIndex < pieceList[piece]; pieceIndex++) {
@@ -1332,8 +1332,8 @@ var chessEngine = function (
 
   /**
    * @brief addPiece will be adding the piece
-   * @param piece is the piece to be added
-   * @param square is the square of the piece
+   * @param {*} piece is the piece to be added
+   * @param {*} square is the square of the piece
    */
   function addPiece(piece, square) {
     board[square] = piece;
@@ -1344,8 +1344,8 @@ var chessEngine = function (
 
   /**
    * @brief makeMove will be making the move
-   * @param move is the move to be made
-   * @return 1 if the move is legal, 0 if the move is illegal
+   * @param {*} move is the move to be made
+   * @return {boolean} true if the move is legal, 0 if the move is illegal
    */
   function makeMove(move) {
     // This updates the plies
@@ -1471,8 +1471,8 @@ var chessEngine = function (
     castle &= castlingRights[nextSquare];
     hashKey ^= castleKeys[castle];
 
-    // Switching the side to move
     side ^= 1;
+
     hashKey ^= sideKey;
 
     if (
@@ -1551,7 +1551,6 @@ var chessEngine = function (
     if (board[previousSquare] == K || board[previousSquare] == k)
       kingSquare[side ^ 1] = previousSquare;
 
-    // Here we are switching the side to move
     side = movesStack[moveIndex].side;
 
     // Restoring the board state variables
@@ -1582,6 +1581,7 @@ var chessEngine = function (
     enpassant = noEnpassant;
     fifty = 0;
     side ^= 1;
+
     hashKey ^= sideKey;
   }
 
@@ -1599,7 +1599,6 @@ var chessEngine = function (
   }
 
   // Simplified Evaluation Material Weights and Points
-
   const materialWeights = [
     0, 100, 320, 330, 500, 900, 20000, -100, -320, -330, -500, -900, -20000,
   ];
@@ -2931,8 +2930,8 @@ var chessEngine = function (
 
   /**
    * @brief sortMoves is a function that will sort the moves
-   * @param currentCount is the current move count
-   * @param moveList is the list of moves
+   * @param {*} currentCount is the current move count
+   * @param {*} moveList is the list of moves
    */
   function sortMoves(currentCount, moveList) {
     for (
@@ -2953,7 +2952,7 @@ var chessEngine = function (
 
   /**
    * @brief sortPVMoves is a function that will sort the PV (principal variation) moves
-   * @param moveList is the list of moves
+   * @param {*} moveList is the list of moves
    */
   function sortPVMoves(moveList) {
     if (followPV) {
@@ -2974,7 +2973,7 @@ var chessEngine = function (
 
   /**
    * @brief storePVMoves will be responsible for storing the PV moves
-   * @param move is the move to be stored
+   * @param {*} move is the move to be stored
    */
   function storePVMoves(move) {
     pvTable[searchOne * 64 + searchOne] = move;
@@ -2989,10 +2988,12 @@ var chessEngine = function (
   }
 
   /**
-   * @brief Queiscence is a function that will be responsible for the Queiscence search
-   * @param alpha is the alpha value
-   * @param beta is the beta value
-   * @return the alpha value
+   * @brief Queiscence is a recursive function that will be responsible for the Queiscence search
+   * @param {*} alpha is the alpha value
+   * @param {*} beta is the beta value
+   * @return {number} the alpha value
+   * @return {number} the beta value
+   *
    */
   function Queiscence(alpha, beta) {
     pvLength[searchOne] = searchOne;
@@ -3038,7 +3039,7 @@ var chessEngine = function (
       // Taking back the move
       takeBack();
 
-      // If the time is up, we want to return 0
+      // If the time is up, we want to return 0 to show that the search is over
       if (timing.stopped == 1) return 0;
 
       // If the score is greater than the value of alpha, we want to store the PV moves
@@ -3057,13 +3058,13 @@ var chessEngine = function (
   }
 
   /**
-   * @brief Negamax is a function that will be responsible for the Negamax search
-   * @param alpha is the alpha value
-   * @param beta is the beta value
-   * @param depth is the depth of the search
-   * @param nullMove is the null move
-   * @return the alpha value if the score is less than or equal to the alpha value
-   * @return the beta value if the score is greater than or equal to the beta value
+   * @brief Negamax is a recursive function that will be responsible for the Negamax search
+   * @param {*} alpha is the alpha value
+   * @param {*} beta is the beta value
+   * @param {*} depth is the depth of the search
+   * @param {*} nullMove is the null move
+   * @return {number} the alpha value if the score is less than or equal to the alpha value
+   * @return {number} the beta value if the score is greater than or equal to the beta value
    */
   function Negamax(alpha, beta, depth, nullMove) {
     pvLength[searchOne] = searchOne;
@@ -3268,7 +3269,7 @@ var chessEngine = function (
 
   /**
    * @brief searchPosition
-   * @param depth is the depth of the search
+   * @param {*} depth is the depth of the search
    */
   function searchPosition(depth) {
     let lastBestMove = 0;
@@ -3333,7 +3334,7 @@ var chessEngine = function (
 
   /**
    * @brief setBoard sets the board position given the FEN string
-   * @param fen is the FEN string
+   * @param {*} fen is the FEN string
    */
   function setBoard(fen) {
     resetBoard();
@@ -3420,7 +3421,7 @@ var chessEngine = function (
 
   /**
    * @brief loadMoves loads the moves
-   * @param moves is the string of moves
+   * @param {*} moves is the string of moves
    */
   function loadMoves(moves) {
     moves = moves.split(" ");
@@ -3436,7 +3437,7 @@ var chessEngine = function (
 
   /**
    * @brief moveToString converts a move to a string
-   * @param move is the move to convert
+   * @param {*} move is the move to convert
    */
   function moveToString(move) {
     if (getMovePromoted(move)) {
@@ -3455,9 +3456,9 @@ var chessEngine = function (
   // GUI VARIABLES
   if (typeof document != "undefined") {
     // Color theme
-    var LIGHT_SQUARE = "#E9EBEE";
-    var DARK_SQUARE = "#7E8796";
-    var SELECT_COLOR = "#B0F3FF";
+    var LIGHT_SQUARE = "#C7C7C7";
+    var DARK_SQUARE = "#71828F";
+    var SELECT_COLOR = "#B4CDB6";
     var NEXT_COLOR = "#E16A55";
     var PREV_COLOR = "#E16A55";
 
@@ -3559,9 +3560,9 @@ var chessEngine = function (
 
     /**
      * @brief movePiece moves a piece from the source to the target square
-     * @param userSource is the source square
-     * @param userTarget is the target square
-     * @param promotedPiece is the piece being promoted
+     * @param {*} userSource is the source square
+     * @param {*} userTarget is the target square
+     * @param {*} promotedPiece is the piece being promoted
      */
     function movePiece(userSource, userTarget, promotedPiece) {
       let moveString =
