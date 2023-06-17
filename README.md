@@ -7,7 +7,7 @@
 
 ## About
 
-A chess engine based on the Negamax algorithm with up to 10th depth game analysis. 
+A chess engine based on the Negamax algorithm with an estimated elo of 1500 - 1600. 
 The GUI includes undoing moves, flipping and resetting the board, under promotions, and custom board positions and evaluation times.
 
 ## Libraries and Tools Used
