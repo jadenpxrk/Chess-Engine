@@ -1,9 +1,9 @@
 # Chess-Engine
 
-![Sample Game Image](https://user-images.githubusercontent.com/78674944/209627773-6a2f4a19-2230-494c-8e25-6377d3531de1.png)
+![Sample image of a game](https://github.com/JaehyeongPark06/Chess-Engine/assets/78674944/f79930b9-761a-47ce-bce0-6b63bf880ba0)
 
+![Chess engine playing against me](https://github.com/JaehyeongPark06/Chess-Engine/assets/78674944/35f52f44-d989-46a5-8bc1-cbdb9d735a7e)
 
-![Chess Engine playing moves](https://user-images.githubusercontent.com/78674944/212571533-b32af74b-257d-47ce-9990-2a9a81a03e23.gif)
 
 ## About
 
