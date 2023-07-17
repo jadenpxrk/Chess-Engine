@@ -31,6 +31,6 @@ The GUI includes undoing moves, flipping and resetting the board, under promotio
 ## License
 See [License](https://github.com/JaehyeongPark06/Chess-Engine/blob/main/LICENSE)
 
-#### You can play against it [here](https://jaehyeong-chess-engine.netlify.app/)
+#### You can play against it [here](https://chess.jadenpark.ca)
 
 
