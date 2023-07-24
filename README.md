@@ -1,13 +1,13 @@
 # Chess-Engine
 
-![Sample Game Image](https://user-images.githubusercontent.com/78674944/209627773-6a2f4a19-2230-494c-8e25-6377d3531de1.png)
+![Sample image of a game](https://github.com/JaehyeongPark06/Chess-Engine/assets/78674944/f79930b9-761a-47ce-bce0-6b63bf880ba0)
 
+![Chess engine playing against me](https://github.com/JaehyeongPark06/Chess-Engine/assets/78674944/35f52f44-d989-46a5-8bc1-cbdb9d735a7e)
 
-![Chess Engine playing moves](https://user-images.githubusercontent.com/78674944/212571533-b32af74b-257d-47ce-9990-2a9a81a03e23.gif)
 
 ## About
 
-A chess engine based on the Negamax algorithm with up to 10th depth game analysis. 
+A chess engine based on the Negamax algorithm with an estimated elo of 1500 - 1600. 
 The GUI includes undoing moves, flipping and resetting the board, under promotions, and custom board positions and evaluation times.
 
 ## Libraries and Tools Used
@@ -31,6 +31,6 @@ The GUI includes undoing moves, flipping and resetting the board, under promotio
 ## License
 See [License](https://github.com/JaehyeongPark06/Chess-Engine/blob/main/LICENSE)
 
-#### You can play against it [here](https://jaehyeong-chess-engine.netlify.app/)
+#### You can play against it [here](https://chess.jadenpark.ca)
 
 
