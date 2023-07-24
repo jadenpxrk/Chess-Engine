@@ -22,23 +22,21 @@
     <div class="input-group mx-auto mt-2 mb-2" style="width: 600px">
       <input id="fen" type="text" class="form-control rounded me-2" />
       <div class="input-group-append">
-        <button onclick="setFen();" class="btn btn-success">Set FEN</button>
+        <button onclick="setFen()" class="btn btn-success">Set FEN</button>
       </div>
     </div>
     <div id="chessboard"></div>
     <div class="btn-group mt-2" style="width: 600px">
-      <button class="btn btn-danger rounded me-3" onclick="resetGame();">
+      <button class="btn btn-danger rounded me-3" onclick="resetGame()">
         Reset
       </button>
       <button class="btn btn-primary rounded me-3" onclick="flip()">
         Flip
       </button>
-      <button class="btn btn-primary rounded me-3" onclick="think();">
+      <button class="btn btn-primary rounded me-3" onclick="think()">
         AI Move
       </button>
-      <button class="btn btn-primary rounded" onclick="undoMove();">
-        Undo
-      </button>
+      <button class="btn btn-primary rounded" onclick="undoMove()">Undo</button>
     </div>
     <div
       class="row mx-auto mt-2"
