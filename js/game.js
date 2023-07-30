@@ -193,7 +193,7 @@ function think() {
 
   // When the function is called, we still go through the normal parameters such as
   // checking the max move time
-  let moveTime = parseInt(document.getElementById("movetime").value);
+  let moveTime = parseFloat(document.getElementById("movetime").value);
 
   // The variable timing will be equal to what the engine's time control is
   let timing = engine.getTimeControl();

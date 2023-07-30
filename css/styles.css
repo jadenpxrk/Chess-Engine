@@ -1,0 +1,52 @@
+body {
+  font-size: 16px;
+  padding: 2rem 0 2rem;
+  background-color: #222527;
+  color: #bfc3c2;
+}
+
+.title {
+  font-weight: 700;
+  margin-bottom: 1rem;
+  font-size: 35px;
+}
+
+.input-group {
+  width: 600px;
+}
+
+.btn-group {
+  width: 600px;
+}
+
+.row.mx-auto.mt-2 {
+  position: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 1rem auto 0 auto;
+  width: 600px;
+}
+
+.control-label {
+  padding: 8px;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.control-select {
+  max-width: 5rem;
+  padding: 4px;
+  cursor: pointer;
+}
+
+.row.mx-auto.mt-4 {
+  width: 600px;
+  position: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.depth-info {
+  font-size: 20px;
+  font-weight: 500;
+}
