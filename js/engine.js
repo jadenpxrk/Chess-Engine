@@ -244,10 +244,10 @@ var chessEngine = function (
     "p1",
   ];
 
-  // The FEN of the starting position
+  // FEN of the starting position
   const startFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 ";
 
-  // Chess board represented by a 1D array where
+  // Chess board represented by a 1D array
   var board = [
     r,
     n,
@@ -387,9 +387,8 @@ var chessEngine = function (
   var hashKey = 0;
   var kingSquare = [e1, e8];
 
-  // The list of pieces in a chess game
+  // List of pieces
   var pieceList = {
-    // The piece counts
     [P]: 0,
     [N]: 0,
     [B]: 0,
@@ -403,11 +402,10 @@ var chessEngine = function (
     [q]: 0,
     [k]: 0,
 
-    // The list of pieces associated with an array
     pieces: new Array(13 * 10),
   };
 
-  // The board moves stack
+  // Board moves stack
   var movesStack = [];
 
   // Plies
@@ -417,7 +415,7 @@ var chessEngine = function (
   // Fixed random seed
   var randomState = 2304203948;
 
-  // This function is generating random 32-bit pseudo legal numbers
+  // Generates random 32-bit pseudo legal numbers
   function random() {
     var number = randomState;
 
@@ -452,7 +450,8 @@ var chessEngine = function (
   function generateHashKey() {
     var finalKey = 0;
 
-    // This is the hash board position
+    // Loops through each square on the board
+    // and gives each piece a random key
     for (var square = 0; square < 128; square++) {
       if ((square & 0x88) == 0) {
         var piece = board[square];
@@ -460,7 +459,7 @@ var chessEngine = function (
       }
     }
 
-    // The hash board state variables
+    // Hash board state variables
     if (side == white) finalKey ^= sideKey;
     if (enpassant != noEnpassant) finalKey ^= pieceKeys[enpassant];
     finalKey ^= castleKeys[castle];
@@ -472,7 +471,7 @@ var chessEngine = function (
    * @brief resetBoard resets the chess board
    */
   function resetBoard() {
-    // Restting the board position requires us to loops through each file and rank
+    // Restting the board position by looping through each file and rank
     for (var rank = 0; rank < 8; rank++) {
       for (var file = 0; file < 16; file++) {
         var square = rank * 16 + file;
@@ -480,7 +479,7 @@ var chessEngine = function (
       }
     }
 
-    // Here, we are resetting the board state variables
+    // Resetting board state variables
     side = -1;
     enpassant = noEnpassant;
     castle = 0;
@@ -489,16 +488,16 @@ var chessEngine = function (
     kingSquare = [0, 0];
     movesStack = [];
 
-    // This is ressetting the plies
+    // Resetting the plies
     searchOne = 0;
     gameOne = 0;
 
-    // This is reseting the repetition table
-    for (let index in repetitionTable) repetitionTable[index] = 0;
+    // Resetting the repetition table
+    for (let idx in repetitionTable) repetitionTable[idx] = 0;
   }
 
   /**
-   * @brief initializePieceList will initialize the piece list
+   * @brief initializePieceList initializes the piece list
    */
   function initializePieceList() {
     for (var piece = P; piece <= k; piece++) pieceList[piece] = 0;
@@ -526,7 +525,7 @@ var chessEngine = function (
     let moveList = [];
     generateMoves(moveList);
 
-    // This parsing moves into a string
+    // Parsing moves into a string
     var previousSquare =
       moveString[0].charCodeAt() -
       "a".charCodeAt() +
@@ -536,7 +535,7 @@ var chessEngine = function (
       "a".charCodeAt() +
       (8 - (moveString[3].charCodeAt() - "0".charCodeAt())) * 16;
 
-    // This will be checking that the move is valid
+    // Checking that the move is valid
     for (var count = 0; count < moveList.length; count++) {
       var move = moveList[count].move;
       var promotedPiece = 0;
@@ -545,29 +544,24 @@ var chessEngine = function (
         getMoveSource(move) == previousSquare &&
         getMoveTarget(move) == nextSquare
       ) {
-        // Here we will check if a piece is promoting
         promotedPiece = getMovePromoted(move);
         // If the piece is promoting we check what it is promoting to, depending on the user's settings
         if (promotedPiece) {
-          // If it is promoting to a knight
           if (
             (promotedPiece == N || promotedPiece == n) &&
             moveString[4] == "n"
           )
             return move;
-          // If it is promoting to a bishop
           else if (
             (promotedPiece == B || promotedPiece == b) &&
             moveString[4] == "b"
           )
             return move;
-          // If it is promoting to a rook
           else if (
             (promotedPiece == R || promotedPiece == r) &&
             moveString[4] == "r"
           )
             return move;
-          // If it is promoting to a queen
           else if (
             (promotedPiece == Q || promotedPiece == q) &&
             moveString[4] == "q"
@@ -588,7 +582,7 @@ var chessEngine = function (
    * @param {*} side is the side that is attacking
    */
   function isSquareAttacked(square, side) {
-    // If it is being attacked by pawns
+    // Checking if the square is being attacked by a pawn
     for (let index = 0; index < 2; index++) {
       let nextSquare = square + pawnDirections.offsets[side][index];
       if (
@@ -598,23 +592,23 @@ var chessEngine = function (
         return 1;
     }
 
-    for (let piece in jumpingPieces) {
+    for (let piece in fixedPieces) {
       for (let index = 0; index < 8; index++) {
-        let nextSquare = square + jumpingPieces[piece].offsets[index];
+        let nextSquare = square + fixedPieces[piece].offsets[index];
         let targetPiece = board[nextSquare];
         if ((nextSquare & 0x88) == 0)
-          if (targetPiece == jumpingPieces[piece].side[side]) return 1;
+          if (targetPiece == fixedPieces[piece].side[side]) return 1;
       }
     }
 
-    for (let piece in sniperPieces) {
+    for (let piece in dynamicPieces) {
       for (let index = 0; index < 4; index++) {
-        let nextSquare = square + sniperPieces[piece].offsets[index];
+        let nextSquare = square + dynamicPieces[piece].offsets[index];
         while ((nextSquare & 0x88) == 0) {
           var targetPiece = board[nextSquare];
-          if (sniperPieces[piece].side[side].includes(targetPiece)) return 1;
+          if (dynamicPieces[piece].side[side].includes(targetPiece)) return 1;
           if (targetPiece) break;
-          nextSquare += sniperPieces[piece].offsets[index];
+          nextSquare += dynamicPieces[piece].offsets[index];
         }
       }
     }
@@ -687,12 +681,12 @@ var chessEngine = function (
     pawn: [P, p],
   };
 
-  var jumpingPieces = {
+  var fixedPieces = {
     knight: { offsets: knightOffsets, side: [N, n] },
     king: { offsets: kingOffsets, side: [K, k] },
   };
 
-  var sniperPieces = {
+  var dynamicPieces = {
     bishop: {
       offsets: bishopOffsets,
       side: [
@@ -709,7 +703,7 @@ var chessEngine = function (
     },
   };
 
-  // This variable will hold pawn & castling mappings for both sides
+  // Holds pawn & castling mappings for both sides
   var specialMoves = {
     side: [
       {
@@ -1006,9 +1000,9 @@ var chessEngine = function (
           }
         }
 
-        // This will be for castling moves
+        // For castling
         else if (board[previousSquare] == specialMoves.side[side].king) {
-          // This will be for the king side castles
+          // For the king side castles
           if (castle & specialMoves.side[side].castling[0]) {
             if (
               board[specialMoves.side[side].empty[0]] == e &&
@@ -1039,7 +1033,7 @@ var chessEngine = function (
             }
           }
 
-          // This will be for the queen side castles
+          // For the queen side castles
           if (castle & specialMoves.side[side].castling[1]) {
             if (
               board[specialMoves.side[side].empty[2]] == e &&
@@ -1072,12 +1066,12 @@ var chessEngine = function (
           }
         }
 
-        // This is for jumping pieces like the Knight and King
-        for (let piece in jumpingPieces) {
-          if (board[previousSquare] == jumpingPieces[piece].side[side]) {
+        // For knight and king
+        for (let piece in fixedPieces) {
+          if (board[previousSquare] == fixedPieces[piece].side[side]) {
             for (let index = 0; index < 8; index++) {
               let nextSquare =
-                previousSquare + jumpingPieces[piece].offsets[index];
+                previousSquare + fixedPieces[piece].offsets[index];
               let capturedPiece = board[nextSquare];
 
               if ((nextSquare & 0x88) == 0) {
@@ -1104,14 +1098,15 @@ var chessEngine = function (
           }
         }
 
-        for (let piece in sniperPieces) {
+        // For bishop and rook
+        for (let piece in dynamicPieces) {
           if (
-            board[previousSquare] == sniperPieces[piece].side[side][0] ||
-            board[previousSquare] == sniperPieces[piece].side[side][1]
+            board[previousSquare] == dynamicPieces[piece].side[side][0] ||
+            board[previousSquare] == dynamicPieces[piece].side[side][1]
           ) {
             for (var index = 0; index < 4; index++) {
               let nextSquare =
-                previousSquare + sniperPieces[piece].offsets[index];
+                previousSquare + dynamicPieces[piece].offsets[index];
               while (!(nextSquare & 0x88)) {
                 var capturedPiece = board[nextSquare];
 
@@ -1138,7 +1133,7 @@ var chessEngine = function (
                     moveList,
                     encodeMove(previousSquare, nextSquare, 0, 0, 0, 0, 0)
                   );
-                nextSquare += sniperPieces[piece].offsets[index];
+                nextSquare += dynamicPieces[piece].offsets[index];
               }
             }
           }
@@ -1208,11 +1203,11 @@ var chessEngine = function (
             }
           }
         }
-        for (let piece in jumpingPieces) {
-          if (board[previousSquare] == jumpingPieces[piece].side[side]) {
+        for (let piece in fixedPieces) {
+          if (board[previousSquare] == fixedPieces[piece].side[side]) {
             for (let index = 0; index < 8; index++) {
               let nextSquare =
-                previousSquare + jumpingPieces[piece].offsets[index];
+                previousSquare + fixedPieces[piece].offsets[index];
               let capturedPiece = board[nextSquare];
 
               if ((nextSquare & 0x88) == 0) {
@@ -1234,14 +1229,14 @@ var chessEngine = function (
           }
         }
 
-        for (let piece in sniperPieces) {
+        for (let piece in dynamicPieces) {
           if (
-            board[previousSquare] == sniperPieces[piece].side[side][0] ||
-            board[previousSquare] == sniperPieces[piece].side[side][1]
+            board[previousSquare] == dynamicPieces[piece].side[side][0] ||
+            board[previousSquare] == dynamicPieces[piece].side[side][1]
           ) {
             for (var index = 0; index < 4; index++) {
               let nextSquare =
-                previousSquare + sniperPieces[piece].offsets[index];
+                previousSquare + dynamicPieces[piece].offsets[index];
               while (!(nextSquare & 0x88)) {
                 var capturedPiece = board[nextSquare];
 
@@ -1263,7 +1258,7 @@ var chessEngine = function (
                   break;
                 }
 
-                nextSquare += sniperPieces[piece].offsets[index];
+                nextSquare += dynamicPieces[piece].offsets[index];
               }
             }
           }
@@ -1348,20 +1343,20 @@ var chessEngine = function (
    * @return {boolean} true if the move is legal, 0 if the move is illegal
    */
   function makeMove(move) {
-    // This updates the plies
+    // Updates the plies
     searchOne++;
     gameOne++;
 
-    // This updates the repition table
+    // Updates the repition table
     repetitionTable[gameOne] = hashKey;
 
-    // This is parsing the moves to a string
+    // Parsing the moves to a string
     let previousSquare = getMoveSource(move);
     let nextSquare = getMoveTarget(move);
     let promotedPiece = getMovePromoted(move);
     let capturedPiece = board[nextSquare];
 
-    // This is the movesStack board state variables
+    // The movesStack board state variables
     movesStack.push({
       move: move,
       capturedPiece: 0,
@@ -1372,10 +1367,10 @@ var chessEngine = function (
       hash: hashKey,
     });
 
-    // This moves the current piece from the source square to the target square
+    // Moves the current piece from the source square to the target square
     moveCurrentPiece(board[previousSquare], previousSquare, nextSquare);
 
-    // This is updating the fifty move rule
+    // Updating the fifty move rule
     fifty++;
 
     // If the current piece is capturing something, this will remove the captured piece from the board
@@ -1387,14 +1382,14 @@ var chessEngine = function (
       }
       fifty = 0;
     }
-    // In the case that the piece is a pawn, this will assign the fifty move rule value back to 0
+
+    // If the piece is a pawn, assign the fifty move rule value back to 0
     else if (board[nextSquare] == P || board[nextSquare] == p) fifty = 0;
 
-    // This is updating the enpassant square
+    // Updating the enpassant square
     if (enpassant != noEnpassant) hashKey ^= pieceKeys[enpassant];
     enpassant = noEnpassant;
 
-    // The follwing will handle special moves such as enpessant
     if (getMovePawn(move)) {
       // If the side is white and the piece is a pawn
       if (side == white) {
@@ -1407,7 +1402,8 @@ var chessEngine = function (
         hashKey ^= pieceKeys[nextSquare - 16];
       }
     }
-    // This is checking whether the move with the pawn was enpassant
+
+    // Checking whether the move with the pawn was enpassant
     else if (getMoveEnpassant(move)) {
       // enpassant for white
       if (side == white) {
@@ -1422,6 +1418,7 @@ var chessEngine = function (
         removePiece(P, nextSquare - 16);
       }
     }
+
     // If the move was a castle
     else if (getMoveCastling(move)) {
       switch (nextSquare) {
@@ -1440,20 +1437,19 @@ var chessEngine = function (
       }
     }
 
-    // This will handle promotions
     if (promotedPiece) {
       // If the side that is promoting is white
       if (side == white) {
         // Updating the hash key
         hashKey ^= pieceKeys[P * 128 + nextSquare];
         removePiece(P, nextSquare);
-        // We want to remove the white pawn from the square it was last on
+        // Remove the white pawn from the square it was last on
       }
       // If the side that is promoting is black
       else {
         // Updating the hash key
         hashKey ^= pieceKeys[p * 128 + nextSquare];
-        // We want to remove the black pawn from the square it was last on
+        // Remove the black pawn from the square it was last on
         removePiece(p, nextSquare);
       }
       // Adding the promoted piece to the ssquare the pawn was last on
@@ -1490,7 +1486,7 @@ var chessEngine = function (
    * @brief takeBack will be taking back the move
    */
   function takeBack() {
-    // This updates our plies
+    // Updates our plies
     searchOne--;
     gameOne--;
 
@@ -1503,51 +1499,46 @@ var chessEngine = function (
     // Moving the piece from the source square to the target square
     moveCurrentPiece(board[nextSquare], nextSquare, previousSquare);
 
-    // This restores the captured piece
+    // Restores the captured piece
     if (getMoveCapture(move)) {
-      // If a piece was captured, we want to add it back to the board
       addPiece(movesStack[moveIndex].capturedPiece, nextSquare);
     }
 
-    // This is handling special moves if a move was taken back
     // If the move was enppassant
     if (getMoveEnpassant(move)) {
-      // We check if the side was white
+      // Check if the side was white
       if (side == white) addPiece(P, nextSquare - 16);
-      // If it was, we add a black pawn to the square that was captured
+      // Add a black pawn to the square that was captured
       else addPiece(p, nextSquare + 16);
     }
+
     // If the move was a castle
     else if (getMoveCastling(move)) {
-      // We make a switch case to handle the different castling moves, depending on whether it was queen side, king side, and the side that was castling
+      // Handle the different castling moves, depending on whether it was queen side, king side, and the side that was castling
       switch (nextSquare) {
-        // In the case that the move was a king side castle for white
         case g1:
-          moveCurrentPiece(R, f1, h1); // We move the rook back to its original square
+          moveCurrentPiece(R, f1, h1);
           break;
-        // In the case that the mvoe was a queen side castle for white
         case c1:
-          moveCurrentPiece(R, d1, a1); // We move the rook back to its original square
+          moveCurrentPiece(R, d1, a1);
           break;
-        // In the case that the move was a king side castle for black
+
         case g8:
-          moveCurrentPiece(r, f8, h8); // We move the rook back to its original square
+          moveCurrentPiece(r, f8, h8);
           break;
-        // In the case that the move was a queen side castle for black
         case c8:
-          moveCurrentPiece(r, d8, a8); // We move the rook back to its original square
+          moveCurrentPiece(r, d8, a8);
           break;
       }
     }
-    // Here we check if the move was a promotion
+
+    // Check if the move was a promotion
     else if (getMovePromoted(move)) {
-      // If the side was white, we add a pawn back to the square before the promotion and if it was black, we add a pawn to the square before the promotion
       side == white ? addPiece(p, previousSquare) : addPiece(P, previousSquare);
-      // Then we remove the promoted piece
       removePiece(getMovePromoted(move), previousSquare);
     }
 
-    // Here we are updating the king square
+    // Updating the king square
     if (board[previousSquare] == K || board[previousSquare] == k)
       kingSquare[side ^ 1] = previousSquare;
 
@@ -1566,7 +1557,7 @@ var chessEngine = function (
    * @brief makeNullMove will make a null move
    */
   function makeNullMove() {
-    // This is backing up the current board state
+    // Backing up the current board state
     movesStack.push({
       move: 0,
       capturedPiece: 0,
@@ -2661,25 +2652,24 @@ var chessEngine = function (
    * @return {boolean} true if the game is a draw due to insufficient material, false otherwise
    */
   function isMaterialDraw() {
-    // We will first check if there are any pawns for both sides
+    // Check if there are any pawns for both sides
     if (pieceList[P] == 0 && pieceList[p] == 0) {
-      // If there are no pawns, we will check if there are any queens and rooks for both sides
+      // If there are no pawns, check if there are any queens and rooks for both sides
       if (
         pieceList[R] == 0 &&
         pieceList[r] == 0 &&
         pieceList[Q] == 0 &&
         pieceList[q] == 0
       ) {
-        // If there aren't any, we want to check if the number of the bishops on the board for both sides is equal to 0
+        // If there aren't any, check if the number of the bishops on the board for both sides is equal to 0
         if (pieceList[B] == 0 && pieceList[b] == 0) {
-          // If there are no bishops, we want to check if the number of knights on the board for either side is less than 3, if it is, then we want to return true when the function is called
+          // If there are no bishops, check if the number of knights on the board for either side is less than 3, if it is, then return true when the function is called
           if (pieceList[N] < 3 && pieceList[n] < 3) return 1;
         }
-        // If there are no knights, we want to check the number of bushops on the board
+        // If there are no knights, check the number of bushops on the board
         else if (pieceList[N] == 0 && pieceList[n] == 0) {
           // If the value of the number of bishops for any side subtracted the number of bishops for the other
-          // side is less than 2, (it can be either as there is an absolute value function), we also want to return true for the function
-          // if it is called
+          // side is less than 2, we also want to return true for the function if it is called
           if (Math.abs(pieceList[B] - pieceList[b]) < 2) return 1;
         }
         // If there is less than 3 knights and no bishops, or if there is 1 bishop and no knights
@@ -2687,47 +2677,47 @@ var chessEngine = function (
           (pieceList[N] < 3 && pieceList[B] == 0) ||
           (pieceList[B] == 1 && pieceList[N] == 0)
         ) {
-          // We want to check the number of bishops for the other side specifically we're checking if there is less than 3 knights and no bishops, or if there is 1 bishop and no knights
+          // Check the number of bishops for the other side specifically we're checking if there is less than 3 knights and no bishops, or if there is 1 bishop and no knights
           if (
             (pieceList[n] < 3 && pieceList[b] == 0) ||
             (pieceList[b] == 1 && pieceList[n] == 0)
           )
-            // If these conditions are true, we want to return true for the function when it's called
+            // Return true for the function when it's called
             return 1;
         }
       }
-      // If there are no queens, we want to check if there are any rooks
+      // If there are no queens, check if there are any rooks
       else if (pieceList[Q] == 0 && pieceList[q] == 0) {
-        // If each side has 1 rook, we want to check if there are any knights or bishops on the board
+        // If each side has 1 rook, check if there are any knights or bishops on the board
         if (pieceList[R] == 1 && pieceList[r] == 1) {
-          // If the number of knights and bishops for each side is less than 2, we want to return true for the function when it's called
+          // If the number of knights and bishops for each side is less than 2, return true for the function when it's called
           if (
             pieceList[N] + pieceList[B] < 2 &&
             pieceList[n] + pieceList[b] < 2
           )
             return 1;
         }
-        // If there is 1 rook for each side, we want to check if there are any knights or bishops on the board
+        // If there is 1 rook for each side, check if there are any knights or bishops on the board
         else if (pieceList[R] == 1 && pieceList[r] == 0) {
           if (
             pieceList[N] + pieceList[B] == 0 &&
             (pieceList[n] + pieceList[b] == 1 ||
               pieceList[n] + pieceList[b] == 2)
           )
-            // If all these conditions are met true, we want to return true if the function is called
+            // Return true if the function is called
             return 1;
         }
-        // If one side has a rook but the other does not, we want to check if there are any knights or bishops on the board
+        // If one side has a rook but the other does not, check if there are any knights or bishops on the board
         else if (pieceList[r] == 1 && pieceList[R] == 0) {
-          // Here we are checking if the sum of the bishops and knights on the side with the rook are 0 and if
+          // Checking if the sum of the bishops and knights on the side with the rook are 0 and if
           // the sum of the bishops and knights on the side without the rook is 1 or 2
           if (
             pieceList[n] + pieceList[b] == 0 &&
             (pieceList[N] + pieceList[B] == 1 ||
               pieceList[N] + pieceList[B] == 2)
           )
+            // Return true if the function is called
             return 1;
-          // If all of these conditions are met, we want to return true if the function is called
         }
       }
     }
@@ -2739,7 +2729,7 @@ var chessEngine = function (
    * @return {number} 0 if the game is in the opening phase, 1 if the game is in the endgame phase
    */
   function getGamePhase() {
-    // We want to return "endgame" if there are no queens on board
+    // return endgame if there are no queens on board
     if (pieceList[Q] == 0 || pieceList[q] == 0) return 1;
 
     // Initialize phaseScore to 0
@@ -2751,8 +2741,9 @@ var chessEngine = function (
     for (let piece = n; piece <= q; piece++)
       phaseScore += pieceList[piece] * -materialWeights[piece];
 
-    // If the phaseScore value is greater than 2460, we want to return "0" for opening or false
-    // If the phaseScore is lower than 2460, we want to return "1" for endgame or true
+    // phaseScore value:
+    // greater than 2460, return opening
+    // lower than 2460, return endgame
     return phaseScore > 2460 ? 0 : 1;
   }
 
@@ -2761,23 +2752,23 @@ var chessEngine = function (
    * @return {number} the score of the game
    */
   function evaluate() {
-    // We will be calling the isMaterialDraw function to check if the game is a draw by insufficient material
-    // If this function returns true, we return 0 or in other words tell the engine not to evaluate a move as the game is over
+    // If true, engine does not evaluate a move as the game is over
     if (isMaterialDraw()) return 0;
+
     // Initializing a score of 0
     let score = 0;
+
     // Initializing a variable called phase as the getGamePhase boolean function
     let phase = getGamePhase();
 
-    // The following will be evaluating the material and positional score for each piece on the board
     for (let piece = P; piece <= k; piece++) {
       for (pieceIndex = 0; pieceIndex < pieceList[piece]; pieceIndex++) {
         let square = pieceList.pieces[piece * 10 + pieceIndex];
 
-        // This will be evaluating the score of the game
+        // Evaluating the score of the game
         score += materialWeights[piece];
 
-        // This will be evaluating the positional score of the game
+        // Evaluating the positional score of the game
         switch (piece) {
           case P:
             score += pstPawns[square];
@@ -2797,7 +2788,7 @@ var chessEngine = function (
           case K:
             score += pstKings[phase][square];
             break;
-          // The other side will be evaluated in the same way but will subtract from the total score
+
           case p:
             score -= pstPawns[mirrorSquare[square]];
             break;
@@ -2820,10 +2811,9 @@ var chessEngine = function (
       }
     }
 
-    // We then round the values of the score
     score = Math.round((score * (100 - fifty)) / 100);
 
-    // After that we return the score as normal if white is playing, and negative if black is playing
+    // Return the score as normal if white is playing, and negative if black is playing
     return side == white ? score : -score;
   }
 
@@ -2852,16 +2842,16 @@ var chessEngine = function (
   const DO_NULL = 1;
   const NO_NULL = 0;
 
-  // The search variables
+  // Search variables
   var followPV;
 
-  // The PV table (principal variation)
+  // PV table (principal variation)
   var pvTable = new Array(maxPly * maxPly);
   var pvLength = new Array(maxPly);
   var deadMoves = new Array(2 * maxPly);
   var polanMoves = new Array(13 * 128);
 
-  // The Repetition table
+  // Repetition table
   var repetitionTable = new Array(1000);
 
   // Time control handling
@@ -2941,9 +2931,9 @@ var chessEngine = function (
     ) {
       // Checking if the score of the current move is less than the score of the next move
       if (moveList[currentCount].score < moveList[nextCount].score) {
-        // If so, we will make a temporary variable tempMove the current move
+        // Make a temporary variable tempMove the current move
         let tempMove = moveList[currentCount];
-        // Then we will swap the moves
+        // Swao the moves
         moveList[currentCount] = moveList[nextCount];
         moveList[nextCount] = tempMove;
       }
@@ -2960,9 +2950,9 @@ var chessEngine = function (
       for (let count = 0; count < moveList.length; count++) {
         // If the movelist at the current count is equal to the PV table at the current search depth
         if (moveList[count].move == pvTable[searchOne]) {
-          // We make followPV equal to 1
+          // Make followPV equal to 1
           followPV = 1;
-          // Then we change the score of the current move in the list to 20000
+          // Change the score of the current move in the list to 20000
           moveList[count].score = 20000;
           // Break out of the loop once done
           break;
@@ -3000,21 +2990,20 @@ var chessEngine = function (
     // Increment the nodes searched by one
     nodes++;
 
-    // If the nodes searched is equal to 2047 we want to check the remaining time in the evaluation time
+    // If the nodes searched is equal to 2047 check the remaining time in the evaluation time
     if ((nodes & 2047) == 0) checkTime();
-    // If the search depth is greater than the maximum ply we want to return the evaluation
+
+    // If the search depth is greater than the maximum ply return the evaluation
     if (searchOne > maxPly - 1) return evaluate();
 
     // Creating a variable equal to the evaluation function
     let evaluation = evaluate();
 
-    // If the evaluation is greater than or equal to the beta value, we want to return the vlaue of beta
     if (evaluation >= beta) return beta;
-    // If the evaluation is greater than or equal to the alpha value, we want
-    // to set the value of alpha as the value of the evaluation
+
     if (evaluation > alpha) alpha = evaluation;
 
-    // Making the moveList variable equal to an empty array
+    // Making the moveList array
     var moveList = [];
 
     // Adding captures to the move list
@@ -3031,25 +3020,26 @@ var chessEngine = function (
       // Creating a variable called move equal to the move in the move list
       let move = moveList[count].move;
 
-      // If the move is equal to 0, we want to continue
+      // If the move is equal to 0, continue
       if (makeMove(move) == 0) continue;
 
       // Creating a variable called score equal to the Queiscence function
       var score = -Queiscence(-beta, -alpha);
+
       // Taking back the move
       takeBack();
 
-      // If the time is up, we want to return 0 to show that the search is over
+      // If the time is up, return 0 to show that the search is over
       if (timing.stopped == 1) return 0;
 
-      // If the score is greater than the value of alpha, we want to store the PV moves
+      // If the score is greater than the value of alpha, store the PV moves
       // and make the value of alpha equal to the value of score
       if (score > alpha) {
         storePVMoves(move);
         alpha = score;
 
         // If the score is greater than or equal to the value of beta,
-        // we want to return the value of beta
+        // return the value of beta
         if (score >= beta) return beta;
       }
     }
@@ -3074,11 +3064,13 @@ var chessEngine = function (
     let pvNode = beta - alpha > 1;
     let futilityPruning = 0;
 
-    // If the nodes searched is equal to 2047 we want to check the remaining time in the evaluation time
+    // If the nodes searched is equal to 2047 check the remaining time in the evaluation time
     if ((nodes & 2047) == 0) checkTime();
+
     // If both the searchOne is 1 or true and the isRepition function is true or the count for the
     // fifty move rule is greater than 0, we return 0
     if ((searchOne && isRepetition()) || fifty >= 100) return 0;
+
     // If the depth is equal to 0, we increase the amount of nodes searched and return the Queiscence function
     if (depth == 0) {
       nodes++;
@@ -3086,44 +3078,28 @@ var chessEngine = function (
     }
 
     // Mate distance pruning
-    // If the alpha value is less than -mateValue + searchOne, we want to set the value of alpha
-    // equal to -mateValue
     if (alpha < -mateValue) alpha = -mateValue;
 
-    // If the beta value is greater than mateValue - searchOne, we want to set the value of beta
-    // equal to the mateValue - 1
     if (beta > mateValue - 1) beta = mateValue - 1;
 
-    // If alpha is greater than or equal to beta, we want to return the value of alpha
     if (alpha >= beta) return alpha;
 
-    // Creating a variable legal moves equal to 0
     let legalMoves = 0;
 
-    // Creating a variable called inCheck equal to the isSquareAttacked function with the parameters
-    // kingSquare[side] and side ^ 1
     let inCheck = isSquareAttacked(kingSquare[side], side ^ 1);
 
-    // Checking the extension and if its true, increase the depth by 1
     if (inCheck) depth++;
 
-    // If the value of inCheck is equal to 0 and the pvNode is also equal to 0
-    // we create a variable called staticEval equal to the evaluate function
     if (inCheck == 0 && pvNode == 0) {
       // Static evaluation for pruning purposes
       let staticEval = evaluate();
 
       // Evaluation Pruning
-      // If the depth is less than 3 and the absolute value of beta - 1 is greater than -mateValue + 100
       if (depth < 3 && Math.abs(beta - 1) > -mateValue + 100) {
-        // We create a variable called evalMargin and set the value of it to 120 * depth
         let evalMargin = 120 * depth;
-        // If the staticEval is greater than or equal to the value of beta + evalMargin, we want to return the value of staticEval
-        // minus the value of evalMargin
         if (staticEval - evalMargin >= beta) return staticEval - evalMargin;
       }
 
-      // Checking if nullMove evaluates to true
       if (nullMove) {
         // Nullmove Pruning
         if (
@@ -3132,16 +3108,10 @@ var chessEngine = function (
           getGamePhase() != 1 &&
           staticEval >= beta
         ) {
-          // Calling the makeNullMove function if the searchOne is true and the depth if grather than 2
-          // and if the getGamePhase function is not equal to 1 (in other words not the end game) and the staticEval is greater than or equal to the value of beta
           makeNullMove();
           score = -Negamax(-beta, -beta + 1, depth - 1 - 2, NO_NULL);
           takeNullMove();
-
-          // Then we check if the time stopped and if it did we return 0
           if (timing.stopped == 1) return 0;
-
-          // If the score is greater than or equal to the value of beta, we return the value of beta
           if (score >= beta) return beta;
         }
 
@@ -3231,9 +3201,8 @@ var chessEngine = function (
             score = -Negamax(-beta, -alpha, depth - 1, DO_NULL);
         }
       }
-      // Taking back the move
       takeBack();
-      // Incrementing the moves searched by one
+
       movesSearched++;
 
       if (timing.stopped == 1) return 0;
@@ -3415,7 +3384,6 @@ var chessEngine = function (
     // Generate unique position identifier
     hashKey = generateHashKey();
 
-    // Initialize the piece list
     initializePieceList();
   }
 
