@@ -3115,7 +3115,8 @@ var chessEngine = function (
           if (score >= beta) return beta;
         }
 
-        // Razoring
+        // Razoring - removed as caused engine to miss moves that have a delayed but significant effect on the position
+        /*
         if (depth < 4) {
           score = staticEval + 125;
           let newScore;
@@ -3134,6 +3135,7 @@ var chessEngine = function (
             if (newScore < beta) return newScore > score ? newScore : score;
           }
         }
+        */
       }
 
       // Futility Condition
