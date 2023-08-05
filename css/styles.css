@@ -35,8 +35,7 @@ body {
 
 .control-select {
   max-width: 5rem;
-  padding: 2px 4px 2px 4px;
-  border-radius: 1rem;
+  padding: 4px;
   cursor: pointer;
 }
 
