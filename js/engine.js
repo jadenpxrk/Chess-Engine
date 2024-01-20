@@ -1,3 +1,5 @@
+// TODO: Split into multiple files and classes? (make more modular)
+
 /**
  * @brief chessEngine is the engine for the chess game
  * @param {*} sizeOfBoard is the size of the board in pixels
@@ -649,21 +651,27 @@ var chessEngine = function (
   function getMoveSource(move) {
     return move & 0x7f;
   }
+
   function getMoveTarget(move) {
     return (move >> 7) & 0x7f;
   }
+
   function getMovePromoted(move) {
     return (move >> 14) & 0xf;
   }
+
   function getMoveCapture(move) {
     return (move >> 18) & 0x1;
   }
+
   function getMovePawn(move) {
     return (move >> 19) & 0x1;
   }
+
   function getMoveEnpassant(move) {
     return (move >> 20) & 0x1;
   }
+
   function getMoveCastling(move) {
     return (move >> 21) & 0x1;
   }
@@ -703,7 +711,7 @@ var chessEngine = function (
     },
   };
 
-  // Holds pawn & castling mappings for both sides
+  //
   var specialMoves = {
     side: [
       {
@@ -2838,7 +2846,6 @@ var chessEngine = function (
   const maxPly = 64;
   const infinity = 50000;
   const mateValue = 49000;
-  const mateScore = 48000;
   const DO_NULL = 1;
   const NO_NULL = 0;
 
@@ -2848,6 +2855,8 @@ var chessEngine = function (
   // PV table (principal variation)
   var pvTable = new Array(maxPly * maxPly);
   var pvLength = new Array(maxPly);
+
+  // Move ordering (Heuristics)
   var deadMoves = new Array(2 * maxPly);
   var polanMoves = new Array(13 * 128);
 
