@@ -55,8 +55,6 @@ function dropPiece(event, square) {
   // Then we highlight the square where the piece is located
   // Also check if the dragged piece is not the same color as the source piece
   // Check if it's an empty square
-  console.log(engine.getPiece(userTarget));
-  console.log(engine.getPiece(userSource));
   if (engine.getPiece(userTarget) <= 6 && engine.getPiece(userSource) == 0) {
     document.getElementById(userSource).style.backgroundColor =
       engine.PREV_COLOR;

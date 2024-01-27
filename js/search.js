@@ -245,7 +245,7 @@ var chessEngine = function (
   ];
 
   // FEN of the starting position
-  const STARTFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 ";
+  const START_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 ";
 
   const MATERIAL_WEIGHTS = [
     0, 100, 320, 330, 500, 900, 20000, -100, -320, -330, -500, -900, -20000,
@@ -2985,14 +2985,14 @@ var chessEngine = function (
   }
 
   /**
-   * @brief Queiscence is a recursive function that will be responsible for the Queiscence search
+   * @brief QuiescenceSearch is a recursive function that will be responsible for the Quiescence search
    * @param {*} alpha is the alpha value
    * @param {*} beta is the beta value
    * @return {number} the alpha value
    * @return {number} the beta value
    *
    */
-  function Queiscence(alpha, beta) {
+  function QuiescenceSearch(alpha, beta) {
     pvLength[searchOne] = searchOne;
     // Increment the nodes searched by one
     nodes++;
@@ -3030,14 +3030,14 @@ var chessEngine = function (
       // If the move is equal to 0, continue
       if (makeMove(move) == 0) continue;
 
-      // Creating a variable called score equal to the Queiscence function
-      var score = -Queiscence(-beta, -alpha);
+      // Creating a variable called score equal to the QuiescenceSearch function
+      var score = -QuiescenceSearch(-beta, -alpha);
 
       // Taking back the move
       takeBack();
 
       // If the time is up, return 0 to show that the search is over
-      if (timing.stopped == 1) return 0;
+      if (timing.stopped) return 0;
 
       // If the score is greater than the value of alpha, store the PV moves
       // and make the value of alpha equal to the value of score
@@ -3078,10 +3078,10 @@ var chessEngine = function (
     // fifty move rule is greater than 0, we return 0
     if ((searchOne && isRepetition()) || fifty >= 100) return 0;
 
-    // If the depth is equal to 0, we increase the amount of nodes searched and return the Queiscence function
+    // If the depth is equal to 0, we increase the amount of nodes searched and return the QuiescenceSearch function
     if (depth == 0) {
       nodes++;
-      return Queiscence(alpha, beta);
+      return QuiescenceSearch(alpha, beta);
     }
 
     // Mate distance pruning
@@ -3118,7 +3118,7 @@ var chessEngine = function (
           makeNullMove();
           score = -Negamax(-beta, -beta + 1, depth - 1 - 2, NO_NULL);
           takeNullMove();
-          if (timing.stopped == 1) return 0;
+          if (timing.stopped) return 0;
           if (score >= beta) return beta;
         }
 
@@ -3130,7 +3130,7 @@ var chessEngine = function (
 
           if (score < beta) {
             if (depth == 1) {
-              newScore = Queiscence(alpha, beta);
+              newScore = QuiescenceSearch(alpha, beta);
               return newScore > score ? newScore : score;
             }
           }
@@ -3138,7 +3138,7 @@ var chessEngine = function (
           score += 175;
 
           if (score < beta && depth < 3) {
-            newScore = Queiscence(alpha, beta);
+            newScore = QuiescenceSearch(alpha, beta);
             if (newScore < beta) return newScore > score ? newScore : score;
           }
         }
@@ -3147,6 +3147,7 @@ var chessEngine = function (
 
       // Futility Condition
       let futilityMargin = [0, 200, 300, 500];
+
       if (
         depth < 4 &&
         Math.abs(alpha) < 9000 &&
@@ -3214,7 +3215,7 @@ var chessEngine = function (
 
       movesSearched++;
 
-      if (timing.stopped == 1) return 0;
+      if (timing.stopped) return 0;
       if (score > alpha) {
         alpha = score;
         storePVMoves(move);
@@ -3262,7 +3263,7 @@ var chessEngine = function (
 
       // If the time is up, we stop searching
       if (
-        timing.stopped == 1 ||
+        timing.stopped ||
         (new Date().getTime() > timing.stopTime && timing.time != -1)
       )
         break;
@@ -3272,7 +3273,7 @@ var chessEngine = function (
       }
     }
 
-    let bestMove = timing.stopped == 1 ? lastBestMove : pvTable[0];
+    let bestMove = timing.stopped ? lastBestMove : pvTable[0];
     return bestMove;
   }
 
@@ -3587,7 +3588,7 @@ var chessEngine = function (
     PREV_COLOR: PREV_COLOR,
 
     // Engine constants
-    START_FEN: STARTFEN,
+    START_FEN: START_FEN,
 
     COLOR: {
       WHITE: COLORS.white,
