@@ -5,6 +5,14 @@ body {
   color: #bfc3c2;
 }
 
+.container {
+  width: 95%;
+  max-width: 600px;
+  margin: 0 auto;
+  padding-top: 2.5rem;
+  padding-bottom: 2.5rem;
+}
+
 .title {
   font-weight: 700;
   margin-bottom: 1rem;
@@ -12,11 +20,11 @@ body {
 }
 
 .input-group {
-  width: 600px;
+  width: 100%;
 }
 
 .btn-group {
-  width: 600px;
+  width: 100%;
 }
 
 .row.mx-auto.mt-2 {
