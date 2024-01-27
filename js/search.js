@@ -1460,6 +1460,26 @@ var chessEngine = function (
     PIECES.o,
   ];
 
+  /**
+   *
+   *
+   *
+   *
+   *
+   *
+   *
+   *
+   * Start of Engine Stuff
+   *
+   *
+   *
+   *
+   *
+   *
+   *
+   *
+   */
+
   // Initializing variables for the chess board
   var side = COLORS.white;
   var enpassant = SQUARES.noEnpassant;
@@ -3321,6 +3341,7 @@ var chessEngine = function (
 
     // Check if the fen is empty
     if (fen == "")
+      // Setting as default to avoid errors
       fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
     // Parsing the board position
@@ -3768,7 +3789,7 @@ var chessEngine = function (
       return searchPosition(depth);
     },
 
-    // MISC. FUNCTIONS
+    // MISCELLANEOUS FUNCTIONS
     isMaterialDraw: function () {
       return isMaterialDraw();
     },
