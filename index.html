@@ -18,15 +18,28 @@
     </div>
     <div id="chessboard"></div>
     <div class="btn-group mt-2">
-      <button class="btn btn-danger rounded me-3" onclick="resetGame()">Reset</button>
-      <button class="btn btn-primary rounded me-3" onclick="flip()">Flip</button>
-      <button class="btn btn-primary rounded me-3" onclick="think()">AI Move</button>
+      <button class="btn btn-danger rounded me-3" onclick="resetGame()">
+        Reset
+      </button>
+      <button class="btn btn-primary rounded me-3" onclick="flip()">
+        Flip
+      </button>
+      <button class="btn btn-primary rounded me-3" onclick="think()">
+        AI Move
+      </button>
       <button class="btn btn-primary rounded" onclick="undoMove()">Undo</button>
     </div>
     <div class="row mx-auto mt-2">
       <label for="movetime" class="control-label">Enter evaluation time:</label>
-      <input type="number" id="movetime" class="control-select" min="1" step="1" value="1">
-      <label class="control-label">Promotion Type:</label>
+      <input
+        type="number"
+        id="movetime"
+        class="control-select"
+        min="1"
+        step="1"
+        value="1"
+      />
+      <label for="promoted" class="control-label">Promotion Type:</label>
       <select id="promoted" class="control-select">
         <option value="5">Queen</option>
         <option value="4">Rook</option>
@@ -40,6 +53,6 @@
       </div>
     </div>
   </body>
-  <script src="js/engine.js"></script>
+  <script src="js/engine/search.js"></script>
   <script src="js/game.js"></script>
 </html>

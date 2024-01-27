@@ -1,5 +1,3 @@
-// TODO: Split into multiple files and classes? (make more modular)
-
 /**
  * @brief chessEngine is the engine for the chess game
  * @param {*} sizeOfBoard is the size of the board in pixels
@@ -18,104 +16,104 @@ var chessEngine = function (
   nextSquareColor,
   previousSquareColor
 ) {
-  // CONSTANTS
-  const white = 0;
-  const black = 1;
+  const COLORS = {
+    white: "0",
+    black: "1",
+  };
 
-  // PIECE ENCODING
-  const P = 1,
-    N = 2,
-    B = 3,
-    R = 4,
-    Q = 5,
-    K = 6;
+  const PIECES = {
+    // Empty
+    e: 0,
 
-  const p = 7,
-    n = 8,
-    b = 9,
-    r = 10,
-    q = 11,
-    k = 12;
+    // Off-board
+    o: 13,
 
-  const e = 0,
-    o = 13;
+    // White pieces
+    P: 1,
+    N: 2,
+    B: 3,
+    R: 4,
+    Q: 5,
+    K: 6,
 
-  const a8 = 0,
-    b8 = 1,
-    c8 = 2,
-    d8 = 3,
-    e8 = 4,
-    f8 = 5,
-    g8 = 6,
-    h8 = 7;
+    // Black pieces
+    p: 7,
+    n: 8,
+    b: 9,
+    r: 10,
+    q: 11,
+    k: 12,
+  };
 
-  const a7 = 16,
-    b7 = 17,
-    c7 = 18,
-    d7 = 19,
-    e7 = 20,
-    f7 = 21,
-    g7 = 22,
-    h7 = 23;
+  const SQUARES = {
+    a8: 0,
+    b8: 1,
+    c8: 2,
+    d8: 3,
+    e8: 4,
+    f8: 5,
+    g8: 6,
+    h8: 7,
+    a7: 16,
+    b7: 17,
+    c7: 18,
+    d7: 19,
+    e7: 20,
+    f7: 21,
+    g7: 22,
+    h7: 23,
+    a6: 32,
+    b6: 33,
+    c6: 34,
+    d6: 35,
+    e6: 36,
+    f6: 37,
+    g6: 38,
+    h6: 39,
+    a5: 48,
+    b5: 49,
+    c5: 50,
+    d5: 51,
+    e5: 52,
+    f5: 53,
+    g5: 54,
+    h5: 55,
+    a4: 64,
+    b4: 65,
+    c4: 66,
+    d4: 67,
+    e4: 68,
+    f4: 69,
+    g4: 70,
+    h4: 71,
+    a3: 80,
+    b3: 81,
+    c3: 82,
+    d3: 83,
+    e3: 84,
+    f3: 85,
+    g3: 86,
+    h3: 87,
+    a2: 96,
+    b2: 97,
+    c2: 98,
+    d2: 99,
+    e2: 100,
+    f2: 101,
+    g2: 102,
+    h2: 103,
+    a1: 112,
+    b1: 113,
+    c1: 114,
+    d1: 115,
+    e1: 116,
+    f1: 117,
+    g1: 118,
+    h1: 119,
+    noEnpassant: 120,
+  };
 
-  const a6 = 32,
-    b6 = 33,
-    c6 = 34,
-    d6 = 35,
-    e6 = 36,
-    f6 = 37,
-    g6 = 39,
-    h6 = 40;
-
-  const a5 = 48,
-    b5 = 49,
-    c5 = 50,
-    d5 = 51,
-    e5 = 52,
-    f5 = 53,
-    g5 = 54,
-    h5 = 55;
-
-  const a4 = 64,
-    b4 = 65,
-    c4 = 66,
-    d4 = 67,
-    e4 = 68,
-    f4 = 69,
-    g4 = 70,
-    h4 = 71;
-
-  const a3 = 80,
-    b3 = 81,
-    c3 = 82,
-    d3 = 83,
-    e3 = 84,
-    f3 = 85,
-    g3 = 86,
-    h3 = 87;
-
-  const a2 = 96,
-    b2 = 97,
-    c2 = 98,
-    d2 = 99,
-    e2 = 100,
-    f2 = 101,
-    g2 = 102,
-    h2 = 103;
-
-  const a1 = 112,
-    b1 = 113,
-    c1 = 114,
-    d1 = 115,
-    e1 = 116,
-    f1 = 117,
-    g1 = 118,
-    h1 = 119;
-
-  const noEnpassant = 120;
-
-  // PIECE ARRAYS
-  const coordinates = [
+  const COORDINATES = [
     "a8",
     "b8",
     "c8",
@@ -247,162 +245,1243 @@ var chessEngine = function (
   ];
 
   // FEN of the starting position
-  const startFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 ";
+  const STARTFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 ";
+
+  const MATERIAL_WEIGHTS = [
+    0, 100, 320, 330, 500, 900, 20000, -100, -320, -330, -500, -900, -20000,
+  ];
+
+  const PST_PAWNS = [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    50,
+    50,
+    50,
+    50,
+    50,
+    50,
+    50,
+    50,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    10,
+    10,
+    20,
+    30,
+    30,
+    20,
+    10,
+    10,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    5,
+    5,
+    10,
+    25,
+    25,
+    10,
+    5,
+    5,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    0,
+    0,
+    0,
+    20,
+    20,
+    0,
+    0,
+    0,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    5,
+    -5,
+    -10,
+    0,
+    0,
+    -10,
+    -5,
+    5,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    5,
+    10,
+    10,
+    -20,
+    -20,
+    10,
+    10,
+    5,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+  ];
+
+  const PST_KNIGHTS = [
+    -50,
+    -40,
+    -30,
+    -30,
+    -30,
+    -30,
+    -40,
+    -50,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    -40,
+    -20,
+    0,
+    0,
+    0,
+    0,
+    -20,
+    -40,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    -30,
+    0,
+    10,
+    15,
+    15,
+    10,
+    0,
+    -30,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    -30,
+    5,
+    15,
+    20,
+    20,
+    15,
+    5,
+    -30,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    -30,
+    0,
+    15,
+    20,
+    20,
+    15,
+    0,
+    -30,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    -30,
+    5,
+    10,
+    15,
+    15,
+    10,
+    5,
+    -30,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    -40,
+    -20,
+    0,
+    5,
+    5,
+    0,
+    -20,
+    -40,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    -50,
+    -40,
+    -30,
+    -30,
+    -30,
+    -30,
+    -40,
+    -50,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+  ];
+
+  const PST_BISHOPS = [
+    -20,
+    -10,
+    -10,
+    -10,
+    -10,
+    -10,
+    -10,
+    -20,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    -10,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    -10,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    -10,
+    0,
+    5,
+    10,
+    10,
+    5,
+    0,
+    -10,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    -10,
+    5,
+    5,
+    10,
+    10,
+    5,
+    5,
+    -10,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    -10,
+    0,
+    10,
+    10,
+    10,
+    10,
+    0,
+    -10,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    -10,
+    10,
+    10,
+    10,
+    10,
+    10,
+    10,
+    -10,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    -10,
+    5,
+    0,
+    0,
+    0,
+    0,
+    5,
+    -10,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    -20,
+    -10,
+    -10,
+    -10,
+    -10,
+    -10,
+    -10,
+    -20,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+  ];
+
+  const PST_ROOKS = [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    5,
+    10,
+    10,
+    10,
+    10,
+    10,
+    10,
+    5,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    -5,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    -5,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    -5,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    -5,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    -5,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    -5,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    -5,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    -5,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    -5,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    -5,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    0,
+    0,
+    0,
+    5,
+    5,
+    0,
+    0,
+    0,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+  ];
+
+  const PST_QUEENS = [
+    -20,
+    -10,
+    -10,
+    -5,
+    -5,
+    -10,
+    -10,
+    -20,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    -10,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    -10,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    -10,
+    0,
+    5,
+    5,
+    5,
+    5,
+    0,
+    -10,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    -5,
+    0,
+    5,
+    5,
+    5,
+    5,
+    0,
+    -5,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    0,
+    0,
+    5,
+    5,
+    5,
+    5,
+    0,
+    -5,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    -10,
+    5,
+    5,
+    5,
+    5,
+    5,
+    0,
+    -10,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    -10,
+    0,
+    5,
+    0,
+    0,
+    0,
+    0,
+    -10,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    -20,
+    -10,
+    -10,
+    -5,
+    -5,
+    -10,
+    -10,
+    -20,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+  ];
+
+  const PST_KINGS = [
+    // Point square table for the kings in the opening
+    [
+      -30,
+      -40,
+      -40,
+      -50,
+      -50,
+      -40,
+      -40,
+      -30,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      -30,
+      -40,
+      -40,
+      -50,
+      -50,
+      -40,
+      -40,
+      -30,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      -30,
+      -40,
+      -40,
+      -50,
+      -50,
+      -40,
+      -40,
+      -30,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      -30,
+      -40,
+      -40,
+      -50,
+      -50,
+      -40,
+      -40,
+      -30,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      -20,
+      -30,
+      -30,
+      -40,
+      -40,
+      -30,
+      -30,
+      -20,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      -10,
+      -20,
+      -20,
+      -20,
+      -20,
+      -20,
+      -20,
+      -10,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      20,
+      20,
+      0,
+      0,
+      0,
+      0,
+      20,
+      20,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      20,
+      30,
+      10,
+      0,
+      0,
+      10,
+      30,
+      20,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+    ],
+
+    // Point square table for the kings in the endgame
+    [
+      -50,
+      -40,
+      -30,
+      -20,
+      -20,
+      -30,
+      -40,
+      -50,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      -30,
+      -20,
+      -10,
+      0,
+      0,
+      -10,
+      -20,
+      -30,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      -30,
+      -10,
+      20,
+      30,
+      30,
+      20,
+      -10,
+      -30,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      -30,
+      -10,
+      30,
+      40,
+      40,
+      30,
+      -10,
+      -30,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      -30,
+      -10,
+      30,
+      40,
+      40,
+      30,
+      -10,
+      -30,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      -30,
+      -10,
+      20,
+      30,
+      30,
+      20,
+      -10,
+      -30,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      -30,
+      -30,
+      0,
+      0,
+      0,
+      0,
+      -30,
+      -30,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      -50,
+      -30,
+      -30,
+      -30,
+      -30,
+      -30,
+      -30,
+      -50,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+      PIECES.o,
+    ],
+  ];
+
+  // For Black, the PSTs are mirrored
+  const MIRRORED = [
+    SQUARES.a1,
+    SQUARES.b1,
+    SQUARES.c1,
+    SQUARES.d1,
+    SQUARES.e1,
+    SQUARES.f1,
+    SQUARES.g1,
+    SQUARES.h1,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    SQUARES.a2,
+    SQUARES.b2,
+    SQUARES.c2,
+    SQUARES.d2,
+    SQUARES.e2,
+    SQUARES.f2,
+    SQUARES.g2,
+    SQUARES.h2,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    SQUARES.a3,
+    SQUARES.b3,
+    SQUARES.c3,
+    SQUARES.d3,
+    SQUARES.e3,
+    SQUARES.f3,
+    SQUARES.g3,
+    SQUARES.h3,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    SQUARES.a4,
+    SQUARES.b4,
+    SQUARES.c4,
+    SQUARES.d4,
+    SQUARES.e4,
+    SQUARES.f4,
+    SQUARES.g4,
+    SQUARES.h4,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    SQUARES.a5,
+    SQUARES.b5,
+    SQUARES.c5,
+    SQUARES.d5,
+    SQUARES.e5,
+    SQUARES.f5,
+    SQUARES.g5,
+    SQUARES.h5,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    SQUARES.a6,
+    SQUARES.b6,
+    SQUARES.c6,
+    SQUARES.d6,
+    SQUARES.e6,
+    SQUARES.f6,
+    SQUARES.g6,
+    SQUARES.h6,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    SQUARES.a7,
+    SQUARES.b7,
+    SQUARES.c7,
+    SQUARES.d7,
+    SQUARES.e7,
+    SQUARES.f7,
+    SQUARES.g7,
+    SQUARES.h7,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    SQUARES.a8,
+    SQUARES.b8,
+    SQUARES.c8,
+    SQUARES.d8,
+    SQUARES.e8,
+    SQUARES.f8,
+    SQUARES.g8,
+    SQUARES.h8,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+  ];
+
+  // Most Valuable Victim - Least Valuable Aggressor (MVV-LVA) table
+  const MVVLVA = [
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 105, 205, 305, 405, 505, 605, 105,
+    205, 305, 405, 505, 605, 0, 104, 204, 304, 404, 504, 604, 104, 204, 304,
+    404, 504, 604, 0, 103, 203, 303, 403, 503, 603, 103, 203, 303, 403, 503,
+    603, 0, 102, 202, 302, 402, 502, 602, 102, 202, 302, 402, 502, 602, 0, 101,
+    201, 301, 401, 501, 601, 101, 201, 301, 401, 501, 601, 0, 100, 200, 300,
+    400, 500, 600, 100, 200, 300, 400, 500, 600,
+
+    0, 105, 205, 305, 405, 505, 605, 105, 205, 305, 405, 505, 605, 0, 104, 204,
+    304, 404, 504, 604, 104, 204, 304, 404, 504, 604, 0, 103, 203, 303, 403,
+    503, 603, 103, 203, 303, 403, 503, 603, 0, 102, 202, 302, 402, 502, 602,
+    102, 202, 302, 402, 502, 602, 0, 101, 201, 301, 401, 501, 601, 101, 201,
+    301, 401, 501, 601, 0, 100, 200, 300, 400, 500, 600, 100, 200, 300, 400,
+    500, 600,
+  ];
+
+  // SEARCH CONSTANTS
+  const MAX_PLY = 64;
+  const INFINITY = 50000;
+  const MATE_VALUE = 49000;
+  const DO_NULL = 1;
+  const NO_NULL = 0;
 
   // Chess board represented by a 1D array
   var board = [
-    r,
-    n,
-    b,
-    q,
-    k,
-    b,
-    n,
-    r,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    p,
-    p,
-    p,
-    p,
-    p,
-    p,
-    p,
-    p,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    e,
-    e,
-    e,
-    e,
-    e,
-    e,
-    e,
-    e,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    e,
-    e,
-    e,
-    e,
-    e,
-    e,
-    e,
-    e,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    e,
-    e,
-    e,
-    e,
-    e,
-    e,
-    e,
-    e,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    e,
-    e,
-    e,
-    e,
-    e,
-    e,
-    e,
-    e,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    P,
-    P,
-    P,
-    P,
-    P,
-    P,
-    P,
-    P,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    R,
-    N,
-    B,
-    Q,
-    K,
-    B,
-    N,
-    R,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
+    PIECES.r,
+    PIECES.n,
+    PIECES.b,
+    PIECES.q,
+    PIECES.k,
+    PIECES.b,
+    PIECES.n,
+    PIECES.r,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.p,
+    PIECES.p,
+    PIECES.p,
+    PIECES.p,
+    PIECES.p,
+    PIECES.p,
+    PIECES.p,
+    PIECES.p,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.e,
+    PIECES.e,
+    PIECES.e,
+    PIECES.e,
+    PIECES.e,
+    PIECES.e,
+    PIECES.e,
+    PIECES.e,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.e,
+    PIECES.e,
+    PIECES.e,
+    PIECES.e,
+    PIECES.e,
+    PIECES.e,
+    PIECES.e,
+    PIECES.e,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.e,
+    PIECES.e,
+    PIECES.e,
+    PIECES.e,
+    PIECES.e,
+    PIECES.e,
+    PIECES.e,
+    PIECES.e,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.e,
+    PIECES.e,
+    PIECES.e,
+    PIECES.e,
+    PIECES.e,
+    PIECES.e,
+    PIECES.e,
+    PIECES.e,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.P,
+    PIECES.P,
+    PIECES.P,
+    PIECES.P,
+    PIECES.P,
+    PIECES.P,
+    PIECES.P,
+    PIECES.P,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.R,
+    PIECES.N,
+    PIECES.B,
+    PIECES.Q,
+    PIECES.K,
+    PIECES.B,
+    PIECES.N,
+    PIECES.R,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
   ];
 
   // Initializing variables for the chess board
-  var side = white;
-  var enpassant = noEnpassant;
+  var side = COLORS.white;
+  var enpassant = SQUARES.noEnpassant;
   var castle = 15;
   var fifty = 0;
   var hashKey = 0;
-  var kingSquare = [e1, e8];
+  var kingSquare = [SQUARES.e1, SQUARES.e8];
 
   // List of pieces
   var pieceList = {
-    [P]: 0,
-    [N]: 0,
-    [B]: 0,
-    [R]: 0,
-    [Q]: 0,
-    [K]: 0,
-    [p]: 0,
-    [n]: 0,
-    [b]: 0,
-    [r]: 0,
-    [q]: 0,
-    [k]: 0,
+    [PIECES.P]: 0,
+    [PIECES.N]: 0,
+    [PIECES.B]: 0,
+    [PIECES.R]: 0,
+    [PIECES.Q]: 0,
+    [PIECES.K]: 0,
+    [PIECES.p]: 0,
+    [PIECES.n]: 0,
+    [PIECES.b]: 0,
+    [PIECES.r]: 0,
+    [PIECES.q]: 0,
+    [PIECES.k]: 0,
 
     pieces: new Array(13 * 10),
   };
@@ -457,13 +1536,13 @@ var chessEngine = function (
     for (var square = 0; square < 128; square++) {
       if ((square & 0x88) == 0) {
         var piece = board[square];
-        if (piece != e) finalKey ^= pieceKeys[piece * 128 + square];
+        if (piece != PIECES.e) finalKey ^= pieceKeys[piece * 128 + square];
       }
     }
 
     // Hash board state variables
-    if (side == white) finalKey ^= sideKey;
-    if (enpassant != noEnpassant) finalKey ^= pieceKeys[enpassant];
+    if (side == COLORS.white) finalKey ^= sideKey;
+    if (enpassant != SQUARES.noEnpassant) finalKey ^= pieceKeys[enpassant];
     finalKey ^= castleKeys[castle];
 
     return finalKey;
@@ -477,13 +1556,13 @@ var chessEngine = function (
     for (var rank = 0; rank < 8; rank++) {
       for (var file = 0; file < 16; file++) {
         var square = rank * 16 + file;
-        if ((square & 0x88) == 0) board[square] = e;
+        if ((square & 0x88) == 0) board[square] = PIECES.e;
       }
     }
 
     // Resetting board state variables
     side = -1;
-    enpassant = noEnpassant;
+    enpassant = SQUARES.noEnpassant;
     castle = 0;
     fifty = 0;
     hashKey = 0;
@@ -502,7 +1581,7 @@ var chessEngine = function (
    * @brief initializePieceList initializes the piece list
    */
   function initializePieceList() {
-    for (var piece = P; piece <= k; piece++) pieceList[piece] = 0;
+    for (var piece = PIECES.P; piece <= PIECES.k; piece++) pieceList[piece] = 0;
 
     for (var index = 0; index < pieceList.pieces.length; index++)
       pieceList.pieces[index] = 0;
@@ -550,22 +1629,22 @@ var chessEngine = function (
         // If the piece is promoting we check what it is promoting to, depending on the user's settings
         if (promotedPiece) {
           if (
-            (promotedPiece == N || promotedPiece == n) &&
+            (promotedPiece == PIECES.N || promotedPiece == PIECES.n) &&
             moveString[4] == "n"
           )
             return move;
           else if (
-            (promotedPiece == B || promotedPiece == b) &&
+            (promotedPiece == PIECES.B || promotedPiece == PIECES.b) &&
             moveString[4] == "b"
           )
             return move;
           else if (
-            (promotedPiece == R || promotedPiece == r) &&
+            (promotedPiece == PIECES.R || promotedPiece == PIECES.r) &&
             moveString[4] == "r"
           )
             return move;
           else if (
-            (promotedPiece == Q || promotedPiece == q) &&
+            (promotedPiece == PIECES.Q || promotedPiece == PIECES.q) &&
             moveString[4] == "q"
           )
             return move;
@@ -686,65 +1765,64 @@ var chessEngine = function (
       [17, 15],
       [-17, -15],
     ],
-    pawn: [P, p],
+    pawn: [PIECES.P, PIECES.p],
   };
 
   var fixedPieces = {
-    knight: { offsets: knightOffsets, side: [N, n] },
-    king: { offsets: kingOffsets, side: [K, k] },
+    knight: { offsets: knightOffsets, side: [PIECES.N, PIECES.n] },
+    king: { offsets: kingOffsets, side: [PIECES.K, PIECES.k] },
   };
 
   var dynamicPieces = {
     bishop: {
       offsets: bishopOffsets,
       side: [
-        [B, Q],
-        [b, q],
+        [PIECES.B, PIECES.Q],
+        [PIECES.b, PIECES.q],
       ],
     },
     rook: {
       offsets: rookOffsets,
       side: [
-        [R, Q],
-        [r, q],
+        [PIECES.R, PIECES.Q],
+        [PIECES.r, PIECES.q],
       ],
     },
   };
 
-  //
   var specialMoves = {
     side: [
       {
         offset: [-17, -15],
-        pawn: P,
+        pawn: PIECES.P,
         target: -16,
         doubleTarget: -32,
         capture: [7, 12],
-        rank7: [a7, h7],
-        rank2: [a2, h2],
-        promoted: [Q, R, B, N],
-        king: K,
+        rank7: [SQUARES.a7, SQUARES.h7],
+        rank2: [SQUARES.a2, SQUARES.h2],
+        promoted: [PIECES.Q, PIECES.R, PIECES.B, PIECES.N],
+        king: PIECES.K,
         castling: [1, 2],
-        empty: [f1, g1, d1, b1, c1],
-        attacked: [e1, f1, d1],
-        by: [black, white],
-        castle: [e1, g1, c1],
+        empty: [SQUARES.f1, SQUARES.g1, SQUARES.d1, SQUARES.b1, SQUARES.c1],
+        attacked: [SQUARES.e1, SQUARES.f1, SQUARES.d1],
+        by: [COLORS.black, COLORS.white],
+        castle: [SQUARES.e1, SQUARES.g1, SQUARES.c1],
       },
       {
         offset: [17, 15],
-        pawn: p,
+        pawn: PIECES.p,
         target: 16,
         doubleTarget: 32,
         capture: [1, 6],
-        rank7: [a2, h2],
-        rank2: [a7, h7],
-        promoted: [q, r, b, n],
-        king: k,
+        rank7: [SQUARES.a2, SQUARES.h2],
+        rank2: [SQUARES.a7, SQUARES.h7],
+        promoted: [PIECES.q, PIECES.r, PIECES.b, PIECES.n],
+        king: PIECES.k,
         castling: [4, 8],
-        empty: [f8, g8, d8, b8, c8],
-        attacked: [e8, f8, d8],
-        by: [black, white],
-        castle: [e8, g8, c8],
+        empty: [SQUARES.f8, SQUARES.g8, SQUARES.d8, SQUARES.b8, SQUARES.c8],
+        attacked: [SQUARES.e8, SQUARES.f8, SQUARES.d8],
+        by: [COLORS.black, COLORS.white],
+        castle: [SQUARES.e8, SQUARES.g8, SQUARES.c8],
       },
     ],
   };
@@ -758,14 +1836,14 @@ var chessEngine = function (
     15,
     15,
     11,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
     15,
     15,
     15,
@@ -774,14 +1852,14 @@ var chessEngine = function (
     15,
     15,
     15,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
     15,
     15,
     15,
@@ -790,14 +1868,14 @@ var chessEngine = function (
     15,
     15,
     15,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
     15,
     15,
     15,
@@ -806,14 +1884,14 @@ var chessEngine = function (
     15,
     15,
     15,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
     15,
     15,
     15,
@@ -822,14 +1900,14 @@ var chessEngine = function (
     15,
     15,
     15,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
     15,
     15,
     15,
@@ -838,14 +1916,14 @@ var chessEngine = function (
     15,
     15,
     15,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
     15,
     15,
     15,
@@ -854,14 +1932,14 @@ var chessEngine = function (
     15,
     15,
     15,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
     13,
     15,
     15,
@@ -870,14 +1948,14 @@ var chessEngine = function (
     15,
     15,
     14,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
+    PIECES.o,
   ];
 
   /**
@@ -894,7 +1972,7 @@ var chessEngine = function (
       moveScore += 10000;
     } else {
       if (deadMoves[searchOne] == move) moveScore = 9000;
-      else if (deadMoves[maxPly + searchOne] == move) moveScore = 8000;
+      else if (deadMoves[MAX_PLY + searchOne] == move) moveScore = 8000;
       else
         moveScore =
           polanMoves[board[getMoveSource(move)] * 128 + getMoveTarget(move)];
@@ -911,13 +1989,13 @@ var chessEngine = function (
    * @param {*} moveList is the list the moves are being added to
    */
   function generateMoves(moveList) {
-    for (let piece = P; piece <= k; piece++) {
+    for (let piece = PIECES.P; piece <= PIECES.k; piece++) {
       for (let pieceIndex = 0; pieceIndex < pieceList[piece]; pieceIndex++) {
         let previousSquare = pieceList.pieces[piece * 10 + pieceIndex];
 
         if (board[previousSquare] == specialMoves.side[side].pawn) {
           let nextSquare = previousSquare + specialMoves.side[side].target;
-          if ((nextSquare & 0x88) == 0 && board[nextSquare] == e) {
+          if ((nextSquare & 0x88) == 0 && board[nextSquare] == PIECES.e) {
             if (
               previousSquare >= specialMoves.side[side].rank7[0] &&
               previousSquare <= specialMoves.side[side].rank7[1]
@@ -949,7 +2027,7 @@ var chessEngine = function (
               if (
                 previousSquare >= specialMoves.side[side].rank2[0] &&
                 previousSquare <= specialMoves.side[side].rank2[1] &&
-                board[doubleTarget] == e
+                board[doubleTarget] == PIECES.e
               )
                 addMove(
                   moveList,
@@ -959,8 +2037,8 @@ var chessEngine = function (
           }
 
           for (let index = 0; index < 2; index++) {
-            let pawn_offset = specialMoves.side[side].offset[index];
-            let nextSquare = previousSquare + pawn_offset;
+            let pawnOffset = specialMoves.side[side].offset[index];
+            let nextSquare = previousSquare + pawnOffset;
 
             if ((nextSquare & 0x88) == 0) {
               if (
@@ -1013,8 +2091,8 @@ var chessEngine = function (
           // For the king side castles
           if (castle & specialMoves.side[side].castling[0]) {
             if (
-              board[specialMoves.side[side].empty[0]] == e &&
-              board[specialMoves.side[side].empty[1]] == e
+              board[specialMoves.side[side].empty[0]] == PIECES.e &&
+              board[specialMoves.side[side].empty[1]] == PIECES.e
             ) {
               if (
                 isSquareAttacked(
@@ -1044,9 +2122,9 @@ var chessEngine = function (
           // For the queen side castles
           if (castle & specialMoves.side[side].castling[1]) {
             if (
-              board[specialMoves.side[side].empty[2]] == e &&
-              board[specialMoves.side[side].empty[3]] == e &&
-              board[specialMoves.side[side].empty[4]] == e
+              board[specialMoves.side[side].empty[2]] == PIECES.e &&
+              board[specialMoves.side[side].empty[3]] == PIECES.e &&
+              board[specialMoves.side[side].empty[4]] == PIECES.e
             ) {
               if (
                 isSquareAttacked(
@@ -1084,10 +2162,10 @@ var chessEngine = function (
 
               if ((nextSquare & 0x88) == 0) {
                 if (
-                  side == white
-                    ? capturedPiece == e ||
+                  side == COLORS.white
+                    ? capturedPiece == PIECES.e ||
                       (capturedPiece >= 7 && capturedPiece <= 12)
-                    : capturedPiece == e ||
+                    : capturedPiece == PIECES.e ||
                       (capturedPiece >= 1 && capturedPiece <= 6)
                 ) {
                   if (capturedPiece)
@@ -1119,13 +2197,13 @@ var chessEngine = function (
                 var capturedPiece = board[nextSquare];
 
                 if (
-                  side == white
+                  side == COLORS.white
                     ? capturedPiece >= 1 && capturedPiece <= 6
                     : capturedPiece >= 7 && capturedPiece <= 12
                 )
                   break;
                 if (
-                  side == white
+                  side == COLORS.white
                     ? capturedPiece >= 7 && capturedPiece <= 12
                     : capturedPiece >= 1 && capturedPiece <= 6
                 ) {
@@ -1136,7 +2214,7 @@ var chessEngine = function (
                   break;
                 }
 
-                if (capturedPiece == e)
+                if (capturedPiece == PIECES.e)
                   addMove(
                     moveList,
                     encodeMove(previousSquare, nextSquare, 0, 0, 0, 0, 0)
@@ -1155,7 +2233,7 @@ var chessEngine = function (
    * @param {*} moveList is the list of moves
    */
   function generateCaptures(moveList) {
-    for (let piece = P; piece <= k; piece++) {
+    for (let piece = PIECES.P; piece <= PIECES.k; piece++) {
       for (let pieceIndex = 0; pieceIndex < pieceList[piece]; pieceIndex++) {
         let previousSquare = pieceList.pieces[piece * 10 + pieceIndex];
 
@@ -1163,8 +2241,8 @@ var chessEngine = function (
         if (board[previousSquare] == specialMoves.side[side].pawn) {
           let nextSquare = previousSquare + specialMoves.side[side].target;
           for (let index = 0; index < 2; index++) {
-            let pawn_offset = specialMoves.side[side].offset[index];
-            let nextSquare = previousSquare + pawn_offset;
+            let pawnOffset = specialMoves.side[side].offset[index];
+            let nextSquare = previousSquare + pawnOffset;
 
             if ((nextSquare & 0x88) == 0) {
               if (
@@ -1220,10 +2298,10 @@ var chessEngine = function (
 
               if ((nextSquare & 0x88) == 0) {
                 if (
-                  side == white
-                    ? capturedPiece == e ||
+                  side == COLORS.white
+                    ? capturedPiece == PIECES.e ||
                       (capturedPiece >= 7 && capturedPiece <= 12)
-                    : capturedPiece == e ||
+                    : capturedPiece == PIECES.e ||
                       (capturedPiece >= 1 && capturedPiece <= 6)
                 ) {
                   if (capturedPiece)
@@ -1249,13 +2327,13 @@ var chessEngine = function (
                 var capturedPiece = board[nextSquare];
 
                 if (
-                  side == white
+                  side == COLORS.white
                     ? capturedPiece >= 1 && capturedPiece <= 6
                     : capturedPiece >= 7 && capturedPiece <= 12
                 )
                   break;
                 if (
-                  side == white
+                  side == COLORS.white
                     ? capturedPiece >= 7 && capturedPiece <= 12
                     : capturedPiece >= 1 && capturedPiece <= 6
                 ) {
@@ -1303,7 +2381,7 @@ var chessEngine = function (
    */
   function moveCurrentPiece(piece, previousSquare, nextSquare) {
     board[nextSquare] = board[previousSquare];
-    board[previousSquare] = e;
+    board[previousSquare] = PIECES.e;
     hashKey ^= pieceKeys[piece * 128 + previousSquare];
     hashKey ^= pieceKeys[piece * 128 + nextSquare];
 
@@ -1392,15 +2470,16 @@ var chessEngine = function (
     }
 
     // If the piece is a pawn, assign the fifty move rule value back to 0
-    else if (board[nextSquare] == P || board[nextSquare] == p) fifty = 0;
+    else if (board[nextSquare] == PIECES.P || board[nextSquare] == PIECES.p)
+      fifty = 0;
 
     // Updating the enpassant square
-    if (enpassant != noEnpassant) hashKey ^= pieceKeys[enpassant];
-    enpassant = noEnpassant;
+    if (enpassant != SQUARES.noEnpassant) hashKey ^= pieceKeys[enpassant];
+    enpassant = SQUARES.noEnpassant;
 
     if (getMovePawn(move)) {
       // If the side is white and the piece is a pawn
-      if (side == white) {
+      if (side == COLORS.white) {
         enpassant = nextSquare + 16;
         hashKey ^= pieceKeys[nextSquare + 16];
       }
@@ -1414,51 +2493,51 @@ var chessEngine = function (
     // Checking whether the move with the pawn was enpassant
     else if (getMoveEnpassant(move)) {
       // enpassant for white
-      if (side == white) {
-        board[nextSquare + 16] = e;
-        hashKey ^= pieceKeys[p * 128 + nextSquare + 16];
-        removePiece(p, nextSquare + 16);
+      if (side == COLORS.white) {
+        board[nextSquare + 16] = PIECES.e;
+        hashKey ^= pieceKeys[PIECES.p * 128 + nextSquare + 16];
+        removePiece(PIECES.p, nextSquare + 16);
       }
       // enpassant for black
       else {
-        board[nextSquare - 16] = e;
-        hashKey ^= pieceKeys[P * 128 + (nextSquare - 16)];
-        removePiece(P, nextSquare - 16);
+        board[nextSquare - 16] = PIECES.e;
+        hashKey ^= pieceKeys[PIECES.P * 128 + (nextSquare - 16)];
+        removePiece(PIECES.P, nextSquare - 16);
       }
     }
 
     // If the move was a castle
     else if (getMoveCastling(move)) {
       switch (nextSquare) {
-        case g1:
-          moveCurrentPiece(R, h1, f1);
+        case SQUARES.g1:
+          moveCurrentPiece(PIECES.R, SQUARES.h1, SQUARES.f1);
           break;
-        case c1:
-          moveCurrentPiece(R, a1, d1);
+        case SQUARES.c1:
+          moveCurrentPiece(PIECES.R, SQUARES.a1, SQUARES.d1);
           break;
-        case g8:
-          moveCurrentPiece(r, h8, f8);
+        case SQUARES.g8:
+          moveCurrentPiece(PIECES.r, SQUARES.h8, SQUARES.f8);
           break;
-        case c8:
-          moveCurrentPiece(r, a8, d8);
+        case SQUARES.c8:
+          moveCurrentPiece(PIECES.r, SQUARES.a8, SQUARES.d8);
           break;
       }
     }
 
     if (promotedPiece) {
       // If the side that is promoting is white
-      if (side == white) {
+      if (side == COLORS.white) {
         // Updating the hash key
-        hashKey ^= pieceKeys[P * 128 + nextSquare];
-        removePiece(P, nextSquare);
+        hashKey ^= pieceKeys[PIECES.P * 128 + nextSquare];
+        removePiece(PIECES.P, nextSquare);
         // Remove the white pawn from the square it was last on
       }
       // If the side that is promoting is black
       else {
         // Updating the hash key
-        hashKey ^= pieceKeys[p * 128 + nextSquare];
+        hashKey ^= pieceKeys[PIECES.p * 128 + nextSquare];
         // Remove the black pawn from the square it was last on
-        removePiece(p, nextSquare);
+        removePiece(PIECES.p, nextSquare);
       }
       // Adding the promoted piece to the ssquare the pawn was last on
       // The promoted piece will depend on the user's settings
@@ -1466,7 +2545,7 @@ var chessEngine = function (
     }
 
     // Here we are updating the king square
-    if (board[nextSquare] == K || board[nextSquare] == k)
+    if (board[nextSquare] == PIECES.K || board[nextSquare] == PIECES.k)
       kingSquare[side] = nextSquare;
 
     // Updating castle rights
@@ -1481,7 +2560,7 @@ var chessEngine = function (
 
     if (
       isSquareAttacked(
-        side == white ? kingSquare[side ^ 1] : kingSquare[side ^ 1],
+        side == COLORS.white ? kingSquare[side ^ 1] : kingSquare[side ^ 1],
         side
       )
     ) {
@@ -1515,39 +2594,40 @@ var chessEngine = function (
     // If the move was enppassant
     if (getMoveEnpassant(move)) {
       // Check if the side was white
-      if (side == white) addPiece(P, nextSquare - 16);
+      if (side == COLORS.white) addPiece(PIECES.P, nextSquare - 16);
       // Add a black pawn to the square that was captured
-      else addPiece(p, nextSquare + 16);
+      else addPiece(PIECES.p, nextSquare + 16);
     }
 
     // If the move was a castle
     else if (getMoveCastling(move)) {
       // Handle the different castling moves, depending on whether it was queen side, king side, and the side that was castling
       switch (nextSquare) {
-        case g1:
-          moveCurrentPiece(R, f1, h1);
+        case SQUARES.g1:
+          moveCurrentPiece(PIECES.R, SQUARES.f1, SQUARES.h1);
           break;
-        case c1:
-          moveCurrentPiece(R, d1, a1);
+        case SQUARES.c1:
+          moveCurrentPiece(PIECES.R, SQUARES.d1, SQUARES.a1);
           break;
-
-        case g8:
-          moveCurrentPiece(r, f8, h8);
+        case SQUARES.g8:
+          moveCurrentPiece(PIECES.r, SQUARES.f8, SQUARES.h8);
           break;
-        case c8:
-          moveCurrentPiece(r, d8, a8);
+        case SQUARES.c8:
+          moveCurrentPiece(PIECES.r, SQUARES.d8, SQUARES.a8);
           break;
       }
     }
 
     // Check if the move was a promotion
     else if (getMovePromoted(move)) {
-      side == white ? addPiece(p, previousSquare) : addPiece(P, previousSquare);
+      side == COLORS.white
+        ? addPiece(PIECES.p, previousSquare)
+        : addPiece(PIECES.P, previousSquare);
       removePiece(getMovePromoted(move), previousSquare);
     }
 
     // Updating the king square
-    if (board[previousSquare] == K || board[previousSquare] == k)
+    if (board[previousSquare] == PIECES.K || board[previousSquare] == PIECES.k)
       kingSquare[side ^ 1] = previousSquare;
 
     side = movesStack[moveIndex].side;
@@ -1576,8 +2656,8 @@ var chessEngine = function (
       hash: hashKey,
     });
 
-    if (enpassant != noEnpassant) hashKey ^= pieceKeys[enpassant];
-    enpassant = noEnpassant;
+    if (enpassant != SQUARES.noEnpassant) hashKey ^= pieceKeys[enpassant];
+    enpassant = SQUARES.noEnpassant;
     fifty = 0;
     side ^= 1;
 
@@ -1597,1132 +2677,74 @@ var chessEngine = function (
     movesStack.pop();
   }
 
-  // Simplified Evaluation Material Weights and Points
-  const materialWeights = [
-    0, 100, 320, 330, 500, 900, 20000, -100, -320, -330, -500, -900, -20000,
-  ];
-
-  const pstPawns = [
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    50,
-    50,
-    50,
-    50,
-    50,
-    50,
-    50,
-    50,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    10,
-    10,
-    20,
-    30,
-    30,
-    20,
-    10,
-    10,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    5,
-    5,
-    10,
-    25,
-    25,
-    10,
-    5,
-    5,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    0,
-    0,
-    0,
-    20,
-    20,
-    0,
-    0,
-    0,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    5,
-    -5,
-    -10,
-    0,
-    0,
-    -10,
-    -5,
-    5,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    5,
-    10,
-    10,
-    -20,
-    -20,
-    10,
-    10,
-    5,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-  ];
-
-  const pstKnights = [
-    -50,
-    -40,
-    -30,
-    -30,
-    -30,
-    -30,
-    -40,
-    -50,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    -40,
-    -20,
-    0,
-    0,
-    0,
-    0,
-    -20,
-    -40,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    -30,
-    0,
-    10,
-    15,
-    15,
-    10,
-    0,
-    -30,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    -30,
-    5,
-    15,
-    20,
-    20,
-    15,
-    5,
-    -30,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    -30,
-    0,
-    15,
-    20,
-    20,
-    15,
-    0,
-    -30,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    -30,
-    5,
-    10,
-    15,
-    15,
-    10,
-    5,
-    -30,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    -40,
-    -20,
-    0,
-    5,
-    5,
-    0,
-    -20,
-    -40,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    -50,
-    -40,
-    -30,
-    -30,
-    -30,
-    -30,
-    -40,
-    -50,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-  ];
-
-  const pstBishops = [
-    -20,
-    -10,
-    -10,
-    -10,
-    -10,
-    -10,
-    -10,
-    -20,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    -10,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    -10,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    -10,
-    0,
-    5,
-    10,
-    10,
-    5,
-    0,
-    -10,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    -10,
-    5,
-    5,
-    10,
-    10,
-    5,
-    5,
-    -10,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    -10,
-    0,
-    10,
-    10,
-    10,
-    10,
-    0,
-    -10,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    -10,
-    10,
-    10,
-    10,
-    10,
-    10,
-    10,
-    -10,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    -10,
-    5,
-    0,
-    0,
-    0,
-    0,
-    5,
-    -10,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    -20,
-    -10,
-    -10,
-    -10,
-    -10,
-    -10,
-    -10,
-    -20,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-  ];
-
-  const pstRooks = [
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    5,
-    10,
-    10,
-    10,
-    10,
-    10,
-    10,
-    5,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    -5,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    -5,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    -5,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    -5,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    -5,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    -5,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    -5,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    -5,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    -5,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    -5,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    0,
-    0,
-    0,
-    5,
-    5,
-    0,
-    0,
-    0,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-  ];
-
-  const pstQueens = [
-    -20,
-    -10,
-    -10,
-    -5,
-    -5,
-    -10,
-    -10,
-    -20,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    -10,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    -10,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    -10,
-    0,
-    5,
-    5,
-    5,
-    5,
-    0,
-    -10,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    -5,
-    0,
-    5,
-    5,
-    5,
-    5,
-    0,
-    -5,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    0,
-    0,
-    5,
-    5,
-    5,
-    5,
-    0,
-    -5,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    -10,
-    5,
-    5,
-    5,
-    5,
-    5,
-    0,
-    -10,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    -10,
-    0,
-    5,
-    0,
-    0,
-    0,
-    0,
-    -10,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    -20,
-    -10,
-    -10,
-    -5,
-    -5,
-    -10,
-    -10,
-    -20,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-  ];
-
-  const pstKings = [
-    // Point square table for the kings in the opening
-    [
-      -30,
-      -40,
-      -40,
-      -50,
-      -50,
-      -40,
-      -40,
-      -30,
-      o,
-      o,
-      o,
-      o,
-      o,
-      o,
-      o,
-      o,
-      -30,
-      -40,
-      -40,
-      -50,
-      -50,
-      -40,
-      -40,
-      -30,
-      o,
-      o,
-      o,
-      o,
-      o,
-      o,
-      o,
-      o,
-      -30,
-      -40,
-      -40,
-      -50,
-      -50,
-      -40,
-      -40,
-      -30,
-      o,
-      o,
-      o,
-      o,
-      o,
-      o,
-      o,
-      o,
-      -30,
-      -40,
-      -40,
-      -50,
-      -50,
-      -40,
-      -40,
-      -30,
-      o,
-      o,
-      o,
-      o,
-      o,
-      o,
-      o,
-      o,
-      -20,
-      -30,
-      -30,
-      -40,
-      -40,
-      -30,
-      -30,
-      -20,
-      o,
-      o,
-      o,
-      o,
-      o,
-      o,
-      o,
-      o,
-      -10,
-      -20,
-      -20,
-      -20,
-      -20,
-      -20,
-      -20,
-      -10,
-      o,
-      o,
-      o,
-      o,
-      o,
-      o,
-      o,
-      o,
-      20,
-      20,
-      0,
-      0,
-      0,
-      0,
-      20,
-      20,
-      o,
-      o,
-      o,
-      o,
-      o,
-      o,
-      o,
-      o,
-      20,
-      30,
-      10,
-      0,
-      0,
-      10,
-      30,
-      20,
-      o,
-      o,
-      o,
-      o,
-      o,
-      o,
-      o,
-      o,
-    ],
-
-    // Point square table for the kings in the endgame
-    [
-      -50,
-      -40,
-      -30,
-      -20,
-      -20,
-      -30,
-      -40,
-      -50,
-      o,
-      o,
-      o,
-      o,
-      o,
-      o,
-      o,
-      o,
-      -30,
-      -20,
-      -10,
-      0,
-      0,
-      -10,
-      -20,
-      -30,
-      o,
-      o,
-      o,
-      o,
-      o,
-      o,
-      o,
-      o,
-      -30,
-      -10,
-      20,
-      30,
-      30,
-      20,
-      -10,
-      -30,
-      o,
-      o,
-      o,
-      o,
-      o,
-      o,
-      o,
-      o,
-      -30,
-      -10,
-      30,
-      40,
-      40,
-      30,
-      -10,
-      -30,
-      o,
-      o,
-      o,
-      o,
-      o,
-      o,
-      o,
-      o,
-      -30,
-      -10,
-      30,
-      40,
-      40,
-      30,
-      -10,
-      -30,
-      o,
-      o,
-      o,
-      o,
-      o,
-      o,
-      o,
-      o,
-      -30,
-      -10,
-      20,
-      30,
-      30,
-      20,
-      -10,
-      -30,
-      o,
-      o,
-      o,
-      o,
-      o,
-      o,
-      o,
-      o,
-      -30,
-      -30,
-      0,
-      0,
-      0,
-      0,
-      -30,
-      -30,
-      o,
-      o,
-      o,
-      o,
-      o,
-      o,
-      o,
-      o,
-      -50,
-      -30,
-      -30,
-      -30,
-      -30,
-      -30,
-      -30,
-      -50,
-      o,
-      o,
-      o,
-      o,
-      o,
-      o,
-      o,
-      o,
-    ],
-  ];
-
-  // PST for black pieces is the same as for white pieces, but mirrored
-  const mirrorSquare = [
-    a1,
-    b1,
-    c1,
-    d1,
-    e1,
-    f1,
-    g1,
-    h1,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    a2,
-    b2,
-    c2,
-    d2,
-    e2,
-    f2,
-    g2,
-    h2,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    a3,
-    b3,
-    c3,
-    d3,
-    e3,
-    f3,
-    g3,
-    h3,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    a4,
-    b4,
-    c4,
-    d4,
-    e4,
-    f4,
-    g4,
-    h4,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    a5,
-    b5,
-    c5,
-    d5,
-    e5,
-    f5,
-    g5,
-    h5,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    a6,
-    b6,
-    c6,
-    d6,
-    e6,
-    f6,
-    g6,
-    h6,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    a7,
-    b7,
-    c7,
-    d7,
-    e7,
-    f7,
-    g7,
-    h7,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    a8,
-    b8,
-    c8,
-    d8,
-    e8,
-    f8,
-    g8,
-    h8,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-    o,
-  ];
-
   /**
    * @brief isMaterialDraw will check if the game is a draw due to insufficient material
    * @return {boolean} true if the game is a draw due to insufficient material, false otherwise
    */
   function isMaterialDraw() {
     // Check if there are any pawns for both sides
-    if (pieceList[P] == 0 && pieceList[p] == 0) {
+    if (pieceList[PIECES.P] == 0 && pieceList[PIECES.p] == 0) {
       // If there are no pawns, check if there are any queens and rooks for both sides
       if (
-        pieceList[R] == 0 &&
-        pieceList[r] == 0 &&
-        pieceList[Q] == 0 &&
-        pieceList[q] == 0
+        pieceList[PIECES.R] == 0 &&
+        pieceList[PIECES.r] == 0 &&
+        pieceList[PIECES.Q] == 0 &&
+        pieceList[PIECES.q] == 0
       ) {
         // If there aren't any, check if the number of the bishops on the board for both sides is equal to 0
-        if (pieceList[B] == 0 && pieceList[b] == 0) {
+        if (pieceList[PIECES.B] == 0 && pieceList[PIECES.b] == 0) {
           // If there are no bishops, check if the number of knights on the board for either side is less than 3, if it is, then return true when the function is called
-          if (pieceList[N] < 3 && pieceList[n] < 3) return 1;
+          if (pieceList[PIECES.N] < 3 && pieceList[PIECES.n] < 3) return 1;
         }
         // If there are no knights, check the number of bushops on the board
-        else if (pieceList[N] == 0 && pieceList[n] == 0) {
+        else if (pieceList[PIECES.N] == 0 && pieceList[PIECES.n] == 0) {
           // If the value of the number of bishops for any side subtracted the number of bishops for the other
           // side is less than 2, we also want to return true for the function if it is called
-          if (Math.abs(pieceList[B] - pieceList[b]) < 2) return 1;
+          if (Math.abs(pieceList[PIECES.B] - pieceList[PIECES.b]) < 2) return 1;
         }
         // If there is less than 3 knights and no bishops, or if there is 1 bishop and no knights
         else if (
-          (pieceList[N] < 3 && pieceList[B] == 0) ||
-          (pieceList[B] == 1 && pieceList[N] == 0)
+          (pieceList[PIECES.N] < 3 && pieceList[PIECES.B] == 0) ||
+          (pieceList[PIECES.B] == 1 && pieceList[PIECES.N] == 0)
         ) {
           // Check the number of bishops for the other side specifically we're checking if there is less than 3 knights and no bishops, or if there is 1 bishop and no knights
           if (
-            (pieceList[n] < 3 && pieceList[b] == 0) ||
-            (pieceList[b] == 1 && pieceList[n] == 0)
+            (pieceList[PIECES.n] < 3 && pieceList[PIECES.b] == 0) ||
+            (pieceList[PIECES.b] == 1 && pieceList[PIECES.n] == 0)
           )
             // Return true for the function when it's called
             return 1;
         }
       }
       // If there are no queens, check if there are any rooks
-      else if (pieceList[Q] == 0 && pieceList[q] == 0) {
+      else if (pieceList[PIECES.Q] == 0 && pieceList[PIECES.q] == 0) {
         // If each side has 1 rook, check if there are any knights or bishops on the board
-        if (pieceList[R] == 1 && pieceList[r] == 1) {
+        if (pieceList[PIECES.R] == 1 && pieceList[PIECES.r] == 1) {
           // If the number of knights and bishops for each side is less than 2, return true for the function when it's called
           if (
-            pieceList[N] + pieceList[B] < 2 &&
-            pieceList[n] + pieceList[b] < 2
+            pieceList[PIECES.N] + pieceList[PIECES.B] < 2 &&
+            pieceList[PIECES.n] + pieceList[PIECES.b] < 2
           )
             return 1;
         }
         // If there is 1 rook for each side, check if there are any knights or bishops on the board
-        else if (pieceList[R] == 1 && pieceList[r] == 0) {
+        else if (pieceList[PIECES.R] == 1 && pieceList[PIECES.r] == 0) {
           if (
-            pieceList[N] + pieceList[B] == 0 &&
-            (pieceList[n] + pieceList[b] == 1 ||
-              pieceList[n] + pieceList[b] == 2)
+            pieceList[PIECES.N] + pieceList[PIECES.B] == 0 &&
+            (pieceList[PIECES.n] + pieceList[PIECES.b] == 1 ||
+              pieceList[PIECES.n] + pieceList[PIECES.b] == 2)
           )
             // Return true if the function is called
             return 1;
         }
         // If one side has a rook but the other does not, check if there are any knights or bishops on the board
-        else if (pieceList[r] == 1 && pieceList[R] == 0) {
+        else if (pieceList[PIECES.r] == 1 && pieceList[PIECES.R] == 0) {
           // Checking if the sum of the bishops and knights on the side with the rook are 0 and if
           // the sum of the bishops and knights on the side without the rook is 1 or 2
           if (
-            pieceList[n] + pieceList[b] == 0 &&
-            (pieceList[N] + pieceList[B] == 1 ||
-              pieceList[N] + pieceList[B] == 2)
+            pieceList[PIECES.n] + pieceList[PIECES.b] == 0 &&
+            (pieceList[PIECES.N] + pieceList[PIECES.B] == 1 ||
+              pieceList[PIECES.N] + pieceList[PIECES.B] == 2)
           )
             // Return true if the function is called
             return 1;
@@ -2738,16 +2760,16 @@ var chessEngine = function (
    */
   function getGamePhase() {
     // return endgame if there are no queens on board
-    if (pieceList[Q] == 0 || pieceList[q] == 0) return 1;
+    if (pieceList[PIECES.Q] == 0 || pieceList[PIECES.q] == 0) return 1;
 
     // Initialize phaseScore to 0
     let phaseScore = 0;
     // The next 2 for loops will be adding the score of the material for each side to the phaseScore variable
     // It will be using the values stated earlier in the file
-    for (let piece = N; piece <= Q; piece++)
-      phaseScore += pieceList[piece] * materialWeights[piece];
-    for (let piece = n; piece <= q; piece++)
-      phaseScore += pieceList[piece] * -materialWeights[piece];
+    for (let piece = PIECES.N; piece <= PIECES.Q; piece++)
+      phaseScore += pieceList[piece] * MATERIAL_WEIGHTS[piece];
+    for (let piece = PIECES.n; piece <= PIECES.q; piece++)
+      phaseScore += pieceList[piece] * -MATERIAL_WEIGHTS[piece];
 
     // phaseScore value:
     // greater than 2460, return opening
@@ -2769,51 +2791,51 @@ var chessEngine = function (
     // Initializing a variable called phase as the getGamePhase boolean function
     let phase = getGamePhase();
 
-    for (let piece = P; piece <= k; piece++) {
+    for (let piece = PIECES.P; piece <= PIECES.k; piece++) {
       for (pieceIndex = 0; pieceIndex < pieceList[piece]; pieceIndex++) {
         let square = pieceList.pieces[piece * 10 + pieceIndex];
 
         // Evaluating the score of the game
-        score += materialWeights[piece];
+        score += MATERIAL_WEIGHTS[piece];
 
         // Evaluating the positional score of the game
         switch (piece) {
-          case P:
-            score += pstPawns[square];
+          case PIECES.P:
+            score += PST_PAWNS[square];
             break;
-          case N:
-            score += pstKnights[square];
+          case PIECES.N:
+            score += PST_KNIGHTS[square];
             break;
-          case B:
-            score += pstBishops[square];
+          case PIECES.B:
+            score += PST_BISHOPS[square];
             break;
-          case R:
-            score += pstRooks[square];
+          case PIECES.R:
+            score += PST_ROOKS[square];
             break;
-          case Q:
-            score += pstQueens[square];
+          case PIECES.Q:
+            score += PST_QUEENS[square];
             break;
-          case K:
-            score += pstKings[phase][square];
+          case PIECES.K:
+            score += PST_KINGS[phase][square];
             break;
 
-          case p:
-            score -= pstPawns[mirrorSquare[square]];
+          case PIECES.p:
+            score -= PST_PAWNS[MIRRORED[square]];
             break;
-          case n:
-            score -= pstKnights[mirrorSquare[square]];
+          case PIECES.n:
+            score -= PST_KNIGHTS[MIRRORED[square]];
             break;
-          case b:
-            score -= pstBishops[mirrorSquare[square]];
+          case PIECES.b:
+            score -= PST_BISHOPS[MIRRORED[square]];
             break;
-          case r:
-            score -= pstRooks[mirrorSquare[square]];
+          case PIECES.r:
+            score -= PST_ROOKS[MIRRORED[square]];
             break;
-          case q:
-            score -= pstQueens[mirrorSquare[square]];
+          case PIECES.q:
+            score -= PST_QUEENS[MIRRORED[square]];
             break;
-          case k:
-            score -= pstKings[phase][mirrorSquare[square]];
+          case PIECES.k:
+            score -= PST_KINGS[phase][MIRRORED[square]];
             break;
         }
       }
@@ -2822,42 +2844,18 @@ var chessEngine = function (
     score = Math.round((score * (100 - fifty)) / 100);
 
     // Return the score as normal if white is playing, and negative if black is playing
-    return side == white ? score : -score;
+    return side == COLORS.white ? score : -score;
   }
-
-  // Most Valuable Victim - Least Valuable Aggressor (MVV-LVA) table
-  const MVVLVA = [
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 105, 205, 305, 405, 505, 605, 105,
-    205, 305, 405, 505, 605, 0, 104, 204, 304, 404, 504, 604, 104, 204, 304,
-    404, 504, 604, 0, 103, 203, 303, 403, 503, 603, 103, 203, 303, 403, 503,
-    603, 0, 102, 202, 302, 402, 502, 602, 102, 202, 302, 402, 502, 602, 0, 101,
-    201, 301, 401, 501, 601, 101, 201, 301, 401, 501, 601, 0, 100, 200, 300,
-    400, 500, 600, 100, 200, 300, 400, 500, 600,
-
-    0, 105, 205, 305, 405, 505, 605, 105, 205, 305, 405, 505, 605, 0, 104, 204,
-    304, 404, 504, 604, 104, 204, 304, 404, 504, 604, 0, 103, 203, 303, 403,
-    503, 603, 103, 203, 303, 403, 503, 603, 0, 102, 202, 302, 402, 502, 602,
-    102, 202, 302, 402, 502, 602, 0, 101, 201, 301, 401, 501, 601, 101, 201,
-    301, 401, 501, 601, 0, 100, 200, 300, 400, 500, 600, 100, 200, 300, 400,
-    500, 600,
-  ];
-
-  // SEARCH CONSTANTS
-  const maxPly = 64;
-  const infinity = 50000;
-  const mateValue = 49000;
-  const DO_NULL = 1;
-  const NO_NULL = 0;
 
   // Search variables
   var followPV;
 
   // PV table (principal variation)
-  var pvTable = new Array(maxPly * maxPly);
-  var pvLength = new Array(maxPly);
+  var pvTable = new Array(MAX_PLY * MAX_PLY);
+  var pvLength = new Array(MAX_PLY);
 
   // Move ordering (Heuristics)
-  var deadMoves = new Array(2 * maxPly);
+  var deadMoves = new Array(2 * MAX_PLY);
   var polanMoves = new Array(13 * 128);
 
   // Repetition table
@@ -3003,7 +3001,7 @@ var chessEngine = function (
     if ((nodes & 2047) == 0) checkTime();
 
     // If the search depth is greater than the maximum ply return the evaluation
-    if (searchOne > maxPly - 1) return evaluate();
+    if (searchOne > MAX_PLY - 1) return evaluate();
 
     // Creating a variable equal to the evaluation function
     let evaluation = evaluate();
@@ -3087,9 +3085,9 @@ var chessEngine = function (
     }
 
     // Mate distance pruning
-    if (alpha < -mateValue) alpha = -mateValue;
+    if (alpha < -MATE_VALUE) alpha = -MATE_VALUE;
 
-    if (beta > mateValue - 1) beta = mateValue - 1;
+    if (beta > MATE_VALUE - 1) beta = MATE_VALUE - 1;
 
     if (alpha >= beta) return alpha;
 
@@ -3104,7 +3102,7 @@ var chessEngine = function (
       let staticEval = evaluate();
 
       // Evaluation Pruning
-      if (depth < 3 && Math.abs(beta - 1) > -mateValue + 100) {
+      if (depth < 3 && Math.abs(beta - 1) > -MATE_VALUE + 100) {
         let evalMargin = 120 * depth;
         if (staticEval - evalMargin >= beta) return staticEval - evalMargin;
       }
@@ -3196,9 +3194,9 @@ var chessEngine = function (
           (getMoveSource(move) != getMoveSource(deadMoves[searchOne]) ||
             getMoveTarget(move) != getMoveTarget(deadMoves[searchOne])) &&
           (getMoveSource(move) !=
-            getMoveSource(deadMoves[maxPly + searchOne]) ||
+            getMoveSource(deadMoves[MAX_PLY + searchOne]) ||
             getMoveTarget(move) !=
-              getMoveTarget(deadMoves[maxPly + searchOne])) &&
+              getMoveTarget(deadMoves[MAX_PLY + searchOne])) &&
           getMoveCapture(move) == 0 &&
           getMovePromoted(move) == 0
         ) {
@@ -3229,7 +3227,7 @@ var chessEngine = function (
         if (score >= beta) {
           // storing the dead moves
           if (getMoveCapture(move) == 0) {
-            deadMoves[maxPly + searchOne] = deadMoves[searchOne];
+            deadMoves[MAX_PLY + searchOne] = deadMoves[searchOne];
             deadMoves[searchOne] = move;
           }
 
@@ -3240,7 +3238,7 @@ var chessEngine = function (
 
     // Checking whether checkmate or stalemate
     if (legalMoves == 0) {
-      if (inCheck) return -mateValue + searchOne;
+      if (inCheck) return -MATE_VALUE + searchOne;
       else return 0;
     }
 
@@ -3260,7 +3258,7 @@ var chessEngine = function (
     for (let currentDepth = 1; currentDepth <= depth; currentDepth++) {
       lastBestMove = pvTable[0];
       followPV = 1;
-      score = Negamax(-infinity, infinity, currentDepth, DO_NULL);
+      score = Negamax(-INFINITY, INFINITY, currentDepth, DO_NULL);
 
       // If the time is up, we stop searching
       if (
@@ -3286,30 +3284,30 @@ var chessEngine = function (
 
   // Decoding promoted pieces
   var promotedPieces = {
-    [Q]: "q",
-    [R]: "r",
-    [B]: "b",
-    [N]: "n",
-    [q]: "q",
-    [r]: "r",
-    [b]: "b",
-    [n]: "n",
+    [PIECES.Q]: "q",
+    [PIECES.R]: "r",
+    [PIECES.B]: "b",
+    [PIECES.N]: "n",
+    [PIECES.q]: "q",
+    [PIECES.r]: "r",
+    [PIECES.b]: "b",
+    [PIECES.n]: "n",
   };
 
   // Encode ascii pieces
   var charPieces = {
-    P: P,
-    N: N,
-    B: B,
-    R: R,
-    Q: Q,
-    K: K,
-    p: p,
-    n: n,
-    b: b,
-    r: r,
-    q: q,
-    k: k,
+    P: PIECES.P,
+    N: PIECES.N,
+    B: PIECES.B,
+    R: PIECES.R,
+    Q: PIECES.Q,
+    K: PIECES.K,
+    p: PIECES.p,
+    n: PIECES.n,
+    b: PIECES.b,
+    r: PIECES.r,
+    q: PIECES.q,
+    k: PIECES.k,
   };
 
   /**
@@ -3319,6 +3317,10 @@ var chessEngine = function (
   function setBoard(fen) {
     resetBoard();
     var index = 0;
+
+    // Check if the fen is empty
+    if (fen == "")
+      fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
     // Parsing the board position
     for (var rank = 0; rank < 8; rank++) {
@@ -3331,8 +3333,8 @@ var chessEngine = function (
             (fen[index].charCodeAt() >= "A".charCodeAt() &&
               fen[index].charCodeAt() <= "Z".charCodeAt())
           ) {
-            if (fen[index] == "K") kingSquare[white] = square;
-            else if (fen[index] == "k") kingSquare[black] = square;
+            if (fen[index] == "K") kingSquare[COLORS.white] = square;
+            else if (fen[index] == "k") kingSquare[COLORS.black] = square;
             board[square] = charPieces[fen[index]];
             index++;
           }
@@ -3352,7 +3354,7 @@ var chessEngine = function (
 
     // Parsing side to move
     index++;
-    side = fen[index] == "w" ? white : black;
+    side = fen[index] == "w" ? COLORS.white : COLORS.black;
     index += 2;
 
     // Parsing castling rights
@@ -3384,7 +3386,7 @@ var chessEngine = function (
       var file = fen[index].charCodeAt() - "a".charCodeAt();
       var rank = 8 - (fen[index + 1].charCodeAt() - "0".charCodeAt());
       enpassant = rank * 16 + file;
-    } else enpassant = noEnpassant;
+    } else enpassant = SQUARES.noEnpassant;
 
     // Parsing 50 rule move counter
     fifty = parseInt(fen.slice(index, fen.length - 1).split(" ")[1]);
@@ -3421,13 +3423,13 @@ var chessEngine = function (
   function moveToString(move) {
     if (getMovePromoted(move)) {
       return (
-        coordinates[getMoveSource(move)] +
-        coordinates[getMoveTarget(move)] +
+        COORDINATES[getMoveSource(move)] +
+        COORDINATES[getMoveTarget(move)] +
         promotedPieces[getMovePromoted(move)]
       );
     } else {
       return (
-        coordinates[getMoveSource(move)] + coordinates[getMoveTarget(move)]
+        COORDINATES[getMoveSource(move)] + COORDINATES[getMoveTarget(move)]
       );
     }
   }
@@ -3442,13 +3444,13 @@ var chessEngine = function (
     var PREV_COLOR = "#E16A55";
 
     // Square size
-    var CELL_WIDTH = 75;
-    var CELL_HEIGHT = 75;
+    var SQUARE_WIDTH = 75;
+    var SQUARE_HEIGHT = 75;
 
     // Overriding board appearance
     if (sizeOfBoard) {
-      CELL_WIDTH = sizeOfBoard / 8;
-      CELL_HEIGHT = sizeOfBoard / 8;
+      SQUARE_WIDTH = sizeOfBoard / 8;
+      SQUARE_HEIGHT = sizeOfBoard / 8;
     }
     if (lightSquare) {
       LIGHT_SQUARE = lightSquare;
@@ -3500,9 +3502,9 @@ var chessEngine = function (
               '" bgcolor="' +
               ((file + rank) % 2 ? DARK_SQUARE : LIGHT_SQUARE) +
               '" width="' +
-              CELL_WIDTH +
+              SQUARE_WIDTH +
               'px" height="' +
-              CELL_HEIGHT +
+              SQUARE_HEIGHT +
               'px" ' +
               ' onclick="tapPiece(this.id)" ' +
               ' ondragstart="dragPiece(event, this.id)" ' +
@@ -3525,14 +3527,23 @@ var chessEngine = function (
       for (var row = 0; row < 8; row++) {
         for (var col = 0; col < 16; col++) {
           var square = row * 16 + col;
-          if ((square & 0x88) == 0)
-            document.getElementById(square).innerHTML =
-              "<img " +
-              (sizeOfBoard ? sizeOfBoard / 8 : 400 / 8) +
-              'px" draggable="true" src ="imgs/' +
-              // Numbered Images
-              board[square] +
-              '.gif">';
+          if ((square & 0x88) == 0) {
+            var squareElement = document.getElementById(square);
+            var imgHtml = "";
+            if (board[square] !== 0) {
+              imgHtml =
+                '<img id="piece_' +
+                square +
+                '" style="height:' +
+                (sizeOfBoard ? sizeOfBoard / 8 : 400 / 8) +
+                'px;" draggable="true" src="imgs/' +
+                board[square] +
+                '.png">';
+              squareElement.innerHTML = imgHtml;
+            } else {
+              squareElement.innerHTML = imgHtml;
+            }
+          }
         }
       }
     }
@@ -3545,8 +3556,8 @@ var chessEngine = function (
      */
     function movePiece(userSource, userTarget, promotedPiece) {
       let moveString =
-        coordinates[userSource] +
-        coordinates[userTarget] +
+        COORDINATES[userSource] +
+        COORDINATES[userTarget] +
         promotedPieces[promotedPiece];
 
       engine.loadMoves(moveString);
@@ -3557,6 +3568,10 @@ var chessEngine = function (
     // Calling the two functions to render the board initially
     drawBoard();
     updateBoard();
+  }
+
+  function guiError(functionName) {
+    console.error(`Error occurred in function ${functionName}`);
   }
 
   (function initAll() {
@@ -3572,94 +3587,94 @@ var chessEngine = function (
     PREV_COLOR: PREV_COLOR,
 
     // Engine constants
-    START_FEN: startFen,
+    START_FEN: STARTFEN,
 
     COLOR: {
-      WHITE: white,
-      BLACK: black,
+      WHITE: COLORS.white,
+      BLACK: COLORS.black,
     },
 
     PIECE: {
-      NO_PIECE: e,
-      WHITE_PAWN: P,
-      WHITE_KNIGHT: N,
-      WHITE_BISHOP: B,
-      WHITE_ROOK: R,
-      WHITE_QUEEN: Q,
-      WHITE_KING: K,
-      BLACK_PAWN: p,
-      BLACK_KNIGHT: n,
-      BLACK_BISHOP: b,
-      BLACK_ROOK: r,
-      BLACK_QUEEN: q,
-      BLACK_KING: k,
+      NO_PIECE: PIECES.e,
+      WHITE_PAWN: PIECES.P,
+      WHITE_KNIGHT: PIECES.N,
+      WHITE_BISHOP: PIECES.B,
+      WHITE_ROOK: PIECES.R,
+      WHITE_QUEEN: PIECES.Q,
+      WHITE_KING: PIECES.K,
+      BLACK_PAWN: PIECES.p,
+      BLACK_KNIGHT: PIECES.n,
+      BLACK_BISHOP: PIECES.b,
+      BLACK_ROOK: PIECES.r,
+      BLACK_QUEEN: PIECES.q,
+      BLACK_KING: PIECES.k,
     },
 
-    SQUARE: {
-      A8: a8,
-      B8: b8,
-      C8: c8,
-      D8: d8,
-      E8: e8,
-      F8: f8,
-      G8: g8,
-      H8: h8,
-      A7: a7,
-      B7: b7,
-      C7: c7,
-      D7: d7,
-      E7: e7,
-      F7: f7,
-      G7: g7,
-      H7: h7,
-      A6: a6,
-      B6: b6,
-      C6: c6,
-      D6: d6,
-      E6: e6,
-      F6: f6,
-      G6: g6,
-      H6: h6,
-      A5: a5,
-      B5: b5,
-      C5: c5,
-      D5: d5,
-      E5: e5,
-      F5: f5,
-      G5: g5,
-      H5: h5,
-      A4: a4,
-      B4: b4,
-      C4: c4,
-      D4: d4,
-      E4: e4,
-      F4: f4,
-      G4: g4,
-      H4: h4,
-      A3: a3,
-      B3: b3,
-      C3: c3,
-      D3: d3,
-      E3: e3,
-      F3: f3,
-      G3: g3,
-      H3: h3,
-      A2: a2,
-      B2: b2,
-      C2: c2,
-      D2: d2,
-      E2: e2,
-      F2: f2,
-      G2: g2,
-      H2: h2,
-      A1: a1,
-      B1: b1,
-      C1: c1,
-      D1: d1,
-      E1: e1,
-      F1: f1,
-      G1: g1,
-      H1: h1,
+    SQUARES: {
+      A8: SQUARES.a8,
+      B8: SQUARES.b8,
+      C8: SQUARES.c8,
+      D8: SQUARES.d8,
+      E8: SQUARES.e8,
+      F8: SQUARES.f8,
+      G8: SQUARES.g8,
+      H8: SQUARES.h8,
+      A7: SQUARES.a7,
+      B7: SQUARES.b7,
+      C7: SQUARES.c7,
+      D7: SQUARES.d7,
+      E7: SQUARES.e7,
+      F7: SQUARES.f7,
+      G7: SQUARES.g7,
+      H7: SQUARES.h7,
+      A6: SQUARES.a6,
+      B6: SQUARES.b6,
+      C6: SQUARES.c6,
+      D6: SQUARES.d6,
+      E6: SQUARES.e6,
+      F6: SQUARES.f6,
+      G6: SQUARES.g6,
+      H6: SQUARES.h6,
+      A5: SQUARES.a5,
+      B5: SQUARES.b5,
+      C5: SQUARES.c5,
+      D5: SQUARES.d5,
+      E5: SQUARES.e5,
+      F5: SQUARES.f5,
+      G5: SQUARES.g5,
+      H5: SQUARES.h5,
+      A4: SQUARES.a4,
+      B4: SQUARES.b4,
+      C4: SQUARES.c4,
+      D4: SQUARES.d4,
+      E4: SQUARES.e4,
+      F4: SQUARES.f4,
+      G4: SQUARES.g4,
+      H4: SQUARES.h4,
+      A3: SQUARES.a3,
+      B3: SQUARES.b3,
+      C3: SQUARES.c3,
+      D3: SQUARES.d3,
+      E3: SQUARES.e3,
+      F3: SQUARES.f3,
+      G3: SQUARES.g3,
+      H3: SQUARES.h3,
+      A2: SQUARES.a2,
+      B2: SQUARES.b2,
+      C2: SQUARES.c2,
+      D2: SQUARES.d2,
+      E2: SQUARES.e2,
+      F2: SQUARES.f2,
+      G2: SQUARES.g2,
+      H2: SQUARES.h2,
+      A1: SQUARES.a1,
+      B1: SQUARES.b1,
+      C1: SQUARES.c1,
+      D1: SQUARES.d1,
+      E1: SQUARES.e1,
+      F1: SQUARES.f1,
+      G1: SQUARES.g1,
+      H1: SQUARES.h1,
     },
 
     // GUI FUNCTIONS
@@ -3694,7 +3709,7 @@ var chessEngine = function (
 
     // BOARD METHODS
     squareToString: function (square) {
-      return coordinates[square];
+      return COORDINATES[square];
     },
     promotedToString: function (piece) {
       return promotedPieces[piece];

@@ -26,7 +26,7 @@ function dragPiece(event, square) {
 function dragOver(event, square) {
   event.preventDefault();
   // If the user is dragging a piece, then the background color of the initial square will change
-  if (square == userSource) event.target.src = "imgs/0.gif";
+  if (square == userSource) event.target.src = "imgs/0.png";
 }
 
 /**
@@ -48,14 +48,20 @@ function dropPiece(event, square) {
 
   // Moving the piece from the source square to the target square
   engine.movePiece(userSource, userTarget, promotedPiece);
+
   // Setting the click lock to 0 so that the user can click on another piece
   clickLock = 0;
 
   // Then we highlight the square where the piece is located
-  if (engine.getPiece(square)) {
+  // Also check if the dragged piece is not the same color as the source piece
+  // Check if it's an empty square
+  console.log(engine.getPiece(userTarget));
+  console.log(engine.getPiece(userSource));
+  if (engine.getPiece(userTarget) <= 6 && engine.getPiece(userSource) == 0) {
     document.getElementById(userSource).style.backgroundColor =
       engine.PREV_COLOR;
-    document.getElementById(square).style.backgroundColor = engine.NEXT_COLOR;
+    document.getElementById(userTarget).style.backgroundColor =
+      engine.NEXT_COLOR;
   }
   event.preventDefault();
 
@@ -112,10 +118,17 @@ function tapPiece(square) {
           engine.SELECT_COLOR;
         clickLock = 0;
       } else {
-        document.getElementById(userSource).style.backgroundColor =
-          engine.PREV_COLOR;
-        document.getElementById(square).style.backgroundColor =
-          engine.NEXT_COLOR;
+        // 1, 2, 3, 4, 5, 6 is the piece encoding for white
+        // Check if the dragged piece is not the same color as the source piece
+        if (
+          engine.getPiece(userTarget) <= 6 &&
+          engine.getPiece(userSource) == 0
+        ) {
+          document.getElementById(userSource).style.backgroundColor =
+            engine.PREV_COLOR;
+          document.getElementById(userTarget).style.backgroundColor =
+            engine.NEXT_COLOR;
+        }
       }
     }
 
