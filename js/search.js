@@ -1594,7 +1594,7 @@ var chessEngine = function (
     gameOne = 0;
 
     // Resetting the repetition table
-    for (let idx in repetitionTable) repetitionTable[idx] = 0;
+    for (let i in repetitionTable) repetitionTable[i] = 0;
   }
 
   /**
@@ -2598,10 +2598,10 @@ var chessEngine = function (
     gameOne--;
 
     // Parsing the move to a string
-    let moveIndex = movesStack.length - 1;
-    let move = movesStack[moveIndex].move;
-    let previousSquare = getMoveSource(move);
-    let nextSquare = getMoveTarget(move);
+    let moveIndex = movesStack.length - 1,
+      move = movesStack[moveIndex].move,
+      previousSquare = getMoveSource(move),
+      nextSquare = getMoveTarget(move);
 
     // Moving the piece from the source square to the target square
     moveCurrentPiece(board[nextSquare], nextSquare, previousSquare);
@@ -3087,9 +3087,9 @@ var chessEngine = function (
     pvLength[searchOne] = searchOne;
 
     // Initializing the variables
-    let score = 0;
-    let pvNode = beta - alpha > 1;
-    let futilityPruning = 0;
+    let score = 0,
+      pvNode = beta - alpha > 1,
+      futilityPruning = 0;
 
     // If the nodes searched is equal to 2047 check the remaining time in the evaluation time
     if ((nodes & 2047) == 0) checkTime();
@@ -3111,9 +3111,8 @@ var chessEngine = function (
 
     if (alpha >= beta) return alpha;
 
-    let legalMoves = 0;
-
-    let inCheck = isSquareAttacked(kingSquare[side], side ^ 1);
+    let legalMoves = 0,
+      inCheck = isSquareAttacked(kingSquare[side], side ^ 1);
 
     if (inCheck) depth++;
 
@@ -3421,11 +3420,6 @@ var chessEngine = function (
 
     initializePieceList();
   }
-
-  /**
-   * @brief loadMoves loads the moves
-   * @param {*} moves is the string of moves
-   */
   function loadMoves(moves) {
     moves = moves.split(" ");
 
@@ -3438,10 +3432,6 @@ var chessEngine = function (
     searchOne = 0;
   }
 
-  /**
-   * @brief moveToString converts a move to a string
-   * @param {*} move is the move to convert
-   */
   function moveToString(move) {
     if (getMovePromoted(move)) {
       return (
@@ -3458,7 +3448,6 @@ var chessEngine = function (
 
   // GUI VARIABLES
   if (typeof document != "undefined") {
-    // Color theme
     var LIGHT_SQUARE = "#C7C7C7";
     var DARK_SQUARE = "#71828F";
     var SELECT_COLOR = "#B4CDB6";
@@ -3593,7 +3582,7 @@ var chessEngine = function (
   }
 
   function guiError(functionName) {
-    console.error(`Error occurred in function ${functionName}`);
+    console.error(`Error occurred in ${functionName}`);
   }
 
   (function initAll() {
