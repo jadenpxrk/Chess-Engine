@@ -245,7 +245,7 @@ var chessEngine = function (
   ];
 
   // FEN of the starting position
-  const START_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 ";
+  const START_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
   const MATERIAL_WEIGHTS = [
     0, 100, 320, 330, 500, 900, 20000, -100, -320, -330, -500, -900, -20000,
