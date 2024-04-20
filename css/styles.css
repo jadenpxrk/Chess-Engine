@@ -42,7 +42,7 @@ body {
 }
 
 .control-select {
-  max-width: 6.5rem;
+  width: 600px;
   padding: 4px;
   cursor: pointer;
 }
