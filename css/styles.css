@@ -32,7 +32,7 @@ body {
   justify-content: center;
   align-items: center;
   margin: 1rem auto 0 auto;
-  width: 600px;
+  width: 576px;
 }
 
 .control-label {
@@ -42,13 +42,12 @@ body {
 }
 
 .control-select {
-  width: 600px;
   padding: 4px;
   cursor: pointer;
 }
 
 .row.mx-auto.mt-4 {
-  width: 600px;
+  width: 576px;
   position: flex;
   justify-content: center;
   align-items: center;

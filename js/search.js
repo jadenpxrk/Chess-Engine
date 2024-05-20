@@ -3456,13 +3456,9 @@ var chessEngine = function (
 
     // Square size
     var SQUARE_WIDTH = 75;
-    var SQUARE_HEIGHT = 75;
+    var SQUARE_HEIGHT = 72;
 
     // Overriding board appearance
-    if (sizeOfBoard) {
-      SQUARE_WIDTH = sizeOfBoard / 8;
-      SQUARE_HEIGHT = sizeOfBoard / 8;
-    }
     if (lightSquare) {
       LIGHT_SQUARE = lightSquare;
     }
@@ -3546,7 +3542,7 @@ var chessEngine = function (
                 '<img id="piece_' +
                 square +
                 '" style="height:' +
-                (sizeOfBoard ? sizeOfBoard / 8 : 400 / 8) +
+                sizeOfBoard / 8 +
                 'px;" draggable="true" src="imgs/' +
                 board[square] +
                 '.png">';
