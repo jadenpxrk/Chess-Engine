@@ -2,7 +2,7 @@
 
 ![Sample image of a game](https://github.com/JaehyeongPark06/Chess-Engine/assets/78674944/f79930b9-761a-47ce-bce0-6b63bf880ba0)
 
-![Chess engine playing against me](https://github.com/JaehyeongPark06/Chess-Engine/assets/78674944/35f52f44-d989-46a5-8bc1-cbdb9d735a7e)
+![Engine playing against me](https://github.com/JaehyeongPark06/Chess-Engine/assets/78674944/6ddc770f-502c-4784-8a53-140eedcc35bc)
 
 ## About
 
