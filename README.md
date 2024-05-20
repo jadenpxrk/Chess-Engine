@@ -2,7 +2,7 @@
 
 ![Sample of image of game](https://github.com/JaehyeongPark06/Chess-Engine/assets/78674944/0cd7284e-ea79-4389-9795-4309fdfb6fcc)
 
-https://github.com/JaehyeongPark06/Chess-Engine/assets/78674944/d793196b-59b1-40f7-8c3c-90acab095175
+https://github.com/JaehyeongPark06/Chess-Engine/assets/78674944/c243ebcc-5666-4394-8f55-f98df71b6346
 
 ## About
 
