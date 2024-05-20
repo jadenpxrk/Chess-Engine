@@ -1,6 +1,6 @@
 # Chess-Engine
 
-![Sample image of a game](https://github.com/JaehyeongPark06/Chess-Engine/assets/78674944/f79930b9-761a-47ce-bce0-6b63bf880ba0)
+https://github.com/JaehyeongPark06/Chess-Engine/assets/78674944/f46f3a36-24ca-46ce-ae1e-6010ad6cb967
 
 https://github.com/JaehyeongPark06/Chess-Engine/assets/78674944/d793196b-59b1-40f7-8c3c-90acab095175
 
